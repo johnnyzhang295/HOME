@@ -1,4 +1,4 @@
 # HOME
-Code repo for the NASA HOME grant
+Code repo for the NASA HOME NSTRI 
 
 Read me
