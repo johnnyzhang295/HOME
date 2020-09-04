@@ -12,8 +12,6 @@ You should set up your file structure like so:
 |                 |---- partXX.acq
 |           |---- partXY
 |                 |---- partXY.acq
-|           |---- .
-|           |---- .
 |     |---- HOME Github Repo
 
 ```
