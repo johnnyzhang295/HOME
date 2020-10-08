@@ -19,23 +19,28 @@ data_213 = p213(:,8);
 y = [data_201,data_202,data_203,data_208,data_211,data_213];
 
 figure;
-hold on;
+
+xfit = [1,2,3,4,5,6,7,8,9,10,11,12];
 pnums = ['201';'202';'203';'208';'213';'211'];
 for i=1:6
+    subplot(2,3,i);
+    hold on;
+    p = polyfit(xfit,(y(:,i)'),1);
+    yfit = polyval(p,xfit);
+    plot(xfit,yfit,'r','HandleVisibility','off');
     name=strcat('Part',(' '),pnums(i,:));
     scatter(trials,y(:,i),'filled','DisplayName',name);
     xlabel('Trial No')
     ylabel('Normalized HF')
-    titl = ('Trial vs Normalized HF');
+    grid on
+    grid minor
+    titl = strcat('Part',{' '},pnums(i,:),' Trial vs Normalized HF');
+
     title(titl);
+    
+    xlim([1,12])
+    %legend('Location','southeast')
+
 end
-xfit = [1,2,3,4,5,6,7,8,9,10,11,12];
-p = polyfit(xfit,mean(y'),1);
-hold on
-yfit = polyval(p,xfit);
-plot(xfit,yfit,'r','HandleVisibility','off');
-xlim([1,12])
-legend('Location','southeast')
-suptitle('Aggregate Trial Number vs Normalized HF');
-grid on
-grid minor
+
+suptitle('Individual Trial Number vs Normalized HF');

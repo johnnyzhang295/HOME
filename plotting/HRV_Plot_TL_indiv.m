@@ -74,6 +74,8 @@ for i=1:6
     ylabel('Normalized HF [n.u.]')
     titl = strcat('Part',{' '},pnums(i,:),' Taskload Level vs Normalized HF');
     title(titl);
+    grid on
+    grid minor
 end
 
 suptitle('Individual Taskload vs Normalized HF');

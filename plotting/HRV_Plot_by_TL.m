@@ -67,4 +67,6 @@ ylim([.8 1])
 xlabel('Taskload Level')
 ylabel('Normalized HF [n.u.]')
 title('Taskload Level vs Normalized HF')
+grid on
+grid minor
 suptitle('Aggregate Taskload vs Normalized HF');

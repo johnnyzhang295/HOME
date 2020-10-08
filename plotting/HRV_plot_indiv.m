@@ -28,9 +28,9 @@ hold on
 yfit = polyval(p,xfit);
 plot(xfit,yfit,'r','HandleVisibility','off');
 hold off
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 
@@ -42,9 +42,9 @@ p2 = polyfit(wl_202,HFn_202,1);
 yfit2 = polyval(p2,xfit);
 plot(xfit,yfit2,'b','HandleVisibility','off');
 hold off
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 ylim([.9,1])
@@ -59,9 +59,9 @@ plot(xfit,yfit3,'m','HandleVisibility','off');
 hold off
 ylim([.9,1])
 xlim([1,6])
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 
@@ -72,9 +72,9 @@ p4 = polyfit(wl_208,HFn_208,1);
 yfit4 = polyval(p4,xfit);
 plot(xfit,yfit4,'c','HandleVisibility','off');
 hold off
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 ylim([.7,1])
@@ -87,9 +87,9 @@ p5 = polyfit(wl_211,HFn_208,1);
 yfit5 = polyval(p5,xfit);
 plot(xfit,yfit5,'k','HandleVisibility','off');
 hold off
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 ylim([.7,1])
@@ -105,9 +105,9 @@ hold off
 ylim([.8,1])
 xlim([2,8])
 
-legend('Location','northwest')
-xlabel('Normalized HF')
-ylabel('Subjective Workload Rating')
+legend('Location','southeast')
+ylabel('Normalized HF')
+xlabel('Subjective Workload Rating')
 grid on
 grid minor
 
