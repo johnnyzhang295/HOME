@@ -20,12 +20,11 @@ HFn_208 = p208(:,8);
 HFn_211 = p211(:,8);
 HFn_213 = p213(:,8);
 
-xfit = linspace(.65,1);
+xfit = linspace(0,10);
 subplot(2,3,1)
-scatter(HFn_201,wl_201,20,'r','filled','DisplayName','Part 201')
-p = polyfit(HFn_201,wl_201,1);
+scatter(wl_201,HFn_201,20,'r','filled','DisplayName','Part 201')
+p = polyfit(wl_201,HFn_201,1);
 hold on
-xfit = linspace(.65,1);
 yfit = polyval(p,xfit);
 plot(xfit,yfit,'r','HandleVisibility','off');
 hold off
@@ -38,8 +37,8 @@ grid minor
 
 subplot(2,3,2)
 hold on;
-scatter(HFn_202,wl_202,20,'b','filled','DisplayName','Part 202')
-p2 = polyfit(HFn_202,wl_202,1);
+scatter(wl_202,HFn_202,20,'b','filled','DisplayName','Part 202')
+p2 = polyfit(wl_202,HFn_202,1);
 yfit2 = polyval(p2,xfit);
 plot(xfit,yfit2,'b','HandleVisibility','off');
 hold off
@@ -48,30 +47,28 @@ xlabel('Normalized HF')
 ylabel('Subjective Workload Rating')
 grid on
 grid minor
-xlim([.9,1])
-ylim([1,6])
+ylim([.9,1])
+xlim([1,6])
 
 subplot(2,3,3)
 hold on;
-scatter(HFn_203,wl_203,20,'m','filled','DisplayName','Part 203')
-p3 = polyfit(HFn_203,wl_203,1);
+scatter(wl_203,HFn_203,20,'m','filled','DisplayName','Part 203')
+p3 = polyfit(wl_203,HFn_203,1);
 yfit3 = polyval(p3,xfit);
 plot(xfit,yfit3,'m','HandleVisibility','off');
 hold off
-xlim([.9,1])
-ylim([1,6])
+ylim([.9,1])
+xlim([1,6])
 legend('Location','northwest')
 xlabel('Normalized HF')
 ylabel('Subjective Workload Rating')
 grid on
-xlim([.85,1])
-ylim([2,8])
 grid minor
 
 subplot(2,3,4)
 hold on;
-scatter(HFn_208,wl_208,20,'c','filled','DisplayName','Part 208')
-p4 = polyfit(HFn_208,wl_208,1);
+scatter(wl_208,HFn_208,20,'c','filled','DisplayName','Part 208')
+p4 = polyfit(wl_208,HFn_208,1);
 yfit4 = polyval(p4,xfit);
 plot(xfit,yfit4,'c','HandleVisibility','off');
 hold off
@@ -80,13 +77,13 @@ xlabel('Normalized HF')
 ylabel('Subjective Workload Rating')
 grid on
 grid minor
-xlim([.7,1])
-ylim([2,10])
+ylim([.7,1])
+xlim([2,10])
 
 subplot(2,3,5)
 hold on;
-scatter(HFn_211,wl_211,20,'k','filled','DisplayName','Part 211')
-p5 = polyfit(HFn_211,wl_211,1);
+scatter(wl_211,HFn_208,20,'k','filled','DisplayName','Part 211')
+p5 = polyfit(wl_211,HFn_208,1);
 yfit5 = polyval(p5,xfit);
 plot(xfit,yfit5,'k','HandleVisibility','off');
 hold off
@@ -95,21 +92,24 @@ xlabel('Normalized HF')
 ylabel('Subjective Workload Rating')
 grid on
 grid minor
-xlim([.7,1])
-ylim([0,8])
+ylim([.7,1])
+xlim([0,8])
 
 subplot(2,3,6)
 hold on;
-scatter(HFn_213,wl_213,20,'g','filled','DisplayName','Part 213')
-p6 = polyfit(HFn_213,wl_213,1);
+scatter(wl_213, HFn_213,20,'g','filled','DisplayName','Part 213')
+p6 = polyfit(wl_213, HFn_213,1);
 yfit6 = polyval(p6,xfit);
 plot(xfit,yfit6,'g','HandleVisibility','off');
 hold off
-xlim([.8,1])
-ylim([2,8])
+ylim([.8,1])
+xlim([2,8])
 
 legend('Location','northwest')
 xlabel('Normalized HF')
 ylabel('Subjective Workload Rating')
 grid on
 grid minor
+
+
+suptitle('Individual Plots Workload vs Normalized HF');
