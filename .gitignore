@@ -7,3 +7,4 @@
 data/*
 plotting/.ipynb_checkpoints/*
 figures/*
+*.asv
