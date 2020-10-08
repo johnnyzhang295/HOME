@@ -6,3 +6,4 @@
 .ipynb_checkpoints/*
 data/*
 plotting/.ipynb_checkpoints/*
+figures/*
