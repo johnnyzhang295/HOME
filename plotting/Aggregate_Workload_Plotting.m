@@ -13,12 +13,13 @@ wl_203 = workload(25:36);
 wl_208 = workload(37:48);
 wl_211 = workload(49:60);
 wl_213 = workload(61:72);
-HFn_201 = p201(:,8);
-HFn_202 = p202(:,8);
-HFn_203 = p203(:,8);
-HFn_208 = p208(:,8);
-HFn_211 = p211(:,8);
-HFn_213 = p213(:,8);
+data_index=4;
+HFn_201 = p201(:,data_index);
+HFn_202 = p202(:,data_index);
+HFn_203 = p203(:,data_index);
+HFn_208 = p208(:,data_index);
+HFn_211 = p211(:,data_index);
+HFn_213 = p213(:,data_index);
 figure;
 scatter(wl_201,HFn_201,80,'r','filled','DisplayName','Part 201')
 p = polyfit(wl_201,HFn_201,1);
@@ -54,12 +55,12 @@ plot(xfit,yfit6,'g','HandleVisibility','off');
 
 
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel('HF [ms^2]')
 xlabel('Subjective Workload Rating')
-title('Normalized HF vs Workload Rating')
-ylim([.65,1])
+title('HF vs Workload Rating')
+
 xlim([0,10])
 grid on
 grid minor
 
-suptitle('Aggregate Workload vs Normalized HF');
+suptitle('Aggregate Workload vs HF');

@@ -13,12 +13,13 @@ tl_203 = taskload(3,:)';
 tl_208 = taskload(8,:)';
 tl_211 = taskload(11,:)';
 tl_213 = taskload(13,:)';
-HFn_201 = p201(:,8);
-HFn_202 = p202(:,8);
-HFn_203 = p203(:,8);
-HFn_208 = p208(:,8);
-HFn_211 = p211(:,8);
-HFn_213 = p213(:,8);
+data_index=4;
+HFn_201 = p201(:,data_index);
+HFn_202 = p202(:,data_index);
+HFn_203 = p203(:,data_index);
+HFn_208 = p208(:,data_index);
+HFn_211 = p211(:,data_index);
+HFn_213 = p213(:,data_index);
 
 low_213 = mean(HFn_213(1:4));
 med_213 = mean(HFn_213(5:8));
@@ -46,27 +47,36 @@ hi_208 = mean(HFn_208(9:12));
 
 tls = ['Low TL','Medium TL', 'High TL'];
 tlx = [1,2,3];
-y=[mean([low_213,low_211,low_201,low_202,low_203,low_208]),...
-    mean([med_213,med_211,med_201,med_202,med_203,med_208]),...
-    mean([hi_213,hi_211,hi_201,hi_202,hi_203,hi_208])];
 
-e1 = [HFn_213(1:4);HFn_211(1:4);HFn_201(1:4);HFn_202(1:4);HFn_203(1:4);HFn_208(1:4)];
-e2 = [HFn_213(5:8);HFn_211(5:8);HFn_201(5:8);HFn_202(5:8);HFn_203(5:8);HFn_208(5:8)];
-e3 = [HFn_213(9:12);HFn_211(9:12);HFn_201(9:12);HFn_202(9:12);HFn_203(9:12);HFn_208(9:12)];
 
-err = [std(e1) std(e2) std(e3)];
-figure
-e=errorbar(tlx,y,err,'o');
-e.MarkerSize=10;
-e.MarkerFaceColor='b';
-refresh;
-%scatter(tlx,[low_213,med_213,hi_213],100,'filled');
-xticks(0:1:4);
-xlim([0 4])
-ylim([.8 1])
-xlabel('Taskload Level')
-ylabel('Normalized HF [n.u.]')
-title('Taskload Level vs Normalized HF')
-grid on
-grid minor
-suptitle('Aggregate Taskload vs Normalized HF');
+y=[ low_201,med_201,hi_201;
+    low_202,med_202,hi_202;
+    low_203,med_203,hi_203;
+    low_208,med_208,hi_208;
+    low_213,med_213,hi_213;
+    low_211,med_211,hi_211;];
+
+e1 = [std(HFn_201(1:4));std(HFn_202(1:4));std(HFn_203(1:4));std(HFn_208(1:4));std(HFn_213(1:4));std(HFn_211(1:4));];
+e2=[std(HFn_201(5:8));std(HFn_202(5:8));std(HFn_203(5:8));std(HFn_208(5:8));std(HFn_213(5:8));std(HFn_211(5:8))];
+e3 = [std(HFn_201(9:12));std(HFn_202(9:12));std(HFn_203(9:12));std(HFn_208(9:12));std(HFn_213(9:12));std(HFn_211(9:12))];
+ 
+err = [e1, e2, e3];
+
+pnums = ['201';'202';'203';'208';'213';'211'];
+for i=1:6
+    subplot(2,3,i);
+    e=errorbar(tlx,y(i,:),err(i,:),'o');
+    e.MarkerSize=10;
+    e.MarkerFaceColor='b';
+    xticks(0:1:4);
+    xlim([0 4])
+    %ylim([.8 1])
+    xlabel('Taskload Level')
+    ylabel('HF [ms^2]')
+    titl = strcat('Part',{' '},pnums(i,:),' Taskload Level vs HF ');
+    title(titl);
+    grid on
+    grid minor
+end
+
+suptitle('Individual Taskload vs HF');
