@@ -13,12 +13,13 @@ wl_203 = workload(25:36);
 wl_208 = workload(37:48);
 wl_211 = workload(49:60);
 wl_213 = workload(61:72);
-HFn_201 = p201(:,8);
-HFn_202 = p202(:,8);
-HFn_203 = p203(:,8);
-HFn_208 = p208(:,8);
-HFn_211 = p211(:,8);
-HFn_213 = p213(:,8);
+data_index=4;
+HFn_201 = p201(:,data_index);
+HFn_202 = p202(:,data_index);
+HFn_203 = p203(:,data_index);
+HFn_208 = p208(:,data_index);
+HFn_211 = p211(:,data_index);
+HFn_213 = p213(:,data_index);
 
 xfit = linspace(0,10);
 subplot(2,3,1)
@@ -29,7 +30,7 @@ yfit = polyval(p,xfit);
 plot(xfit,yfit,'r','HandleVisibility','off');
 hold off
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
@@ -43,11 +44,10 @@ yfit2 = polyval(p2,xfit);
 plot(xfit,yfit2,'b','HandleVisibility','off');
 hold off
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
-ylim([.9,1])
 xlim([1,6])
 
 subplot(2,3,3)
@@ -57,10 +57,9 @@ p3 = polyfit(wl_203,HFn_203,1);
 yfit3 = polyval(p3,xfit);
 plot(xfit,yfit3,'m','HandleVisibility','off');
 hold off
-ylim([.9,1])
 xlim([1,6])
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
@@ -73,11 +72,11 @@ yfit4 = polyval(p4,xfit);
 plot(xfit,yfit4,'c','HandleVisibility','off');
 hold off
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
-ylim([.7,1])
+
 xlim([2,10])
 
 subplot(2,3,5)
@@ -88,11 +87,10 @@ yfit5 = polyval(p5,xfit);
 plot(xfit,yfit5,'k','HandleVisibility','off');
 hold off
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
-ylim([.7,1])
 xlim([0,8])
 
 subplot(2,3,6)
@@ -102,14 +100,14 @@ p6 = polyfit(wl_213, HFn_213,1);
 yfit6 = polyval(p6,xfit);
 plot(xfit,yfit6,'g','HandleVisibility','off');
 hold off
-ylim([.8,1])
+
 xlim([2,8])
 
 legend('Location','southeast')
-ylabel('Normalized HF')
+ylabel(' HF [ms^2]')
 xlabel('Subjective Workload Rating')
 grid on
 grid minor
 
 
-suptitle('Individual Plots Workload vs Normalized HF');
+suptitle('Individual Plots Workload vs  HF');
