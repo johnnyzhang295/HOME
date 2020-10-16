@@ -12,7 +12,7 @@ hrv211 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part211\Time Based H
 hrv212 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part212\Time Based HRV Analyses By Trial.csv');
 hrv213 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part213\Time Based HRV Analyses By Trial.csv');
 hrv215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Time Based HRV Analyses By Trial.csv');
-
+taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
 b201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Baseline Time Based HRV Analyses By Trial.csv');
 b202 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part202\Baseline Time Based HRV Analyses By Trial.csv');
 b203 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part203\Baseline Time Based HRV Analyses By Trial.csv');
@@ -39,8 +39,8 @@ wl212= workload(2:end,12);
 wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
-data_index = 12;
-normalize=1; %Set normalize to 1 if you want to nomralize, 0 if you want raw
+data_index = 1;
+normalize=0; %Set normalize to 1 if you want to nomralize, 0 if you want raw
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
 rmssd202 = hrv202(:,data_index);
@@ -103,24 +103,44 @@ rm_wl_t = [wl201' rmssd201';
     wl213' rmssd213';
     wl215' rmssd215';];
 
+tl_vs_data = [taskload(1,:) rmssd201';
+    taskload(2,:) rmssd202';
+    taskload(3,:) rmssd203';
+    taskload(4,:) rmssd204';
+    taskload(5,:) rmssd205';
+    taskload(6,:) rmssd206';
+    taskload(8,:) rmssd208';
+    taskload(9,:) rmssd209';
+    taskload(11,:) rmssd211';
+    taskload(12,:) rmssd212';
+    taskload(13,:) rmssd213';
+    taskload(15,:) rmssd215';];
+
+
 xfit = [1,2,3,4,5,6,7,8,9,10,11,12];
 pnums = ['201';'202';'203';'204';'205';'206';'208';'209';'211';'212';'213';'215'];
+
+
+xs = 1:12;
+x_axis = repmat(xs,1,12);
 for i=1:12
     
-    subplot(3,4,i)
+    subplot(2,6,i)
     xlim([1,12])
     hold on; %This hold on must come AFTER the subplot
     p = polyfit(xfit', rm_wl_t(i,13:24)',1);
     yfit = polyval(p,xfit);
     plot(xfit,yfit,'HandleVisibility','off');
-    scatter(xfit,rm_wl_t(i,13:24),'filled','MarkerFaceColor',rand(1,3))
+    gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
+    %scatter(xfit,rm_wl_t(i,13:24),'filled','MarkerFaceColor',rand(1,3))
     xlabel('Trial Order')
-    ylabel('Normalized pNN50')
+    ylabel('Raw HR')
     grid on;
     grid minor;
     titl = strcat('Part',{' '},pnums(i,:),newline);
     title(titl);
+    legend('Location','northeast');
     hold off;
 end
 
-suptitle('Individual Normalized Aggregate Trial Order vs pNN50 ')
+suptitle('Individual Raw Trial Order vs HR grouped by Taskload ')
