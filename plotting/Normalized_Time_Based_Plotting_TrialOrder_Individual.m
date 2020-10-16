@@ -40,7 +40,7 @@ wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
 data_index = 1;
-normalize=0; %Set normalize to 1 if you want to nomralize, 0 if you want raw
+normalize=2; %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
 rmssd202 = hrv202(:,data_index);
@@ -73,6 +73,23 @@ if (normalize==1)
     rmssd212 = hrv212(:,data_index)/b212(data_index);
     rmssd213 = hrv213(:,data_index)/b213(data_index);
     rmssd215 = hrv215(:,data_index)/b215(data_index);
+    
+   
+end
+
+if (normalize==2)
+    rmssd201 = hrv201(:,data_index)-b201(data_index);
+    rmssd202 = hrv202(:,data_index)-b202(data_index);
+    rmssd203 = hrv203(:,data_index)-b203(data_index);
+    rmssd204 = hrv204(:,data_index)-b204(data_index);
+    rmssd205 = hrv205(:,data_index)-b205(data_index);
+    rmssd206 = hrv206(:,data_index)-b206(data_index);
+    rmssd208 = hrv208(:,data_index)-b208(data_index);
+    rmssd209 = hrv209(:,data_index)-b209(data_index);
+    rmssd211 = hrv211(:,data_index)-b211(data_index);
+    rmssd212 = hrv212(:,data_index)-b212(data_index);
+    rmssd213 = hrv213(:,data_index)-b213(data_index);
+    rmssd215 = hrv215(:,data_index)-b215(data_index);
     
    
 end
@@ -123,6 +140,9 @@ pnums = ['201';'202';'203';'204';'205';'206';'208';'209';'211';'212';'213';'215'
 
 xs = 1:12;
 x_axis = repmat(xs,1,12);
+
+
+
 for i=1:12
     
     subplot(2,6,i)
@@ -134,7 +154,16 @@ for i=1:12
     gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
     %scatter(xfit,rm_wl_t(i,13:24),'filled','MarkerFaceColor',rand(1,3))
     xlabel('Trial Order')
-    ylabel('Raw HR')
+    if (normalize == 0)
+        
+        ylabel('Raw Values')
+    elseif (normalize == 1)
+        
+        ylabel('Normalized')
+    else
+        ylabel('Change Score')        
+    end
+    
     grid on;
     grid minor;
     titl = strcat('Part',{' '},pnums(i,:),newline);
@@ -143,4 +172,4 @@ for i=1:12
     hold off;
 end
 
-suptitle('Individual Raw Trial Order vs HR grouped by Taskload ')
+suptitle('Individual Change Score Trial Order vs HR grouped by Taskload ')
