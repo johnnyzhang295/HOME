@@ -1,17 +1,43 @@
 clear all;
 
+d = 1;
+myPlot(d,0,0);
+myPlot(d,0,1);
+myPlot(d,0,2);
+myPlot(d,1,0);
+myPlot(d,1,1);
+myPlot(d,1,2);
 
+d=2;
+myPlot(d,0,0);
+myPlot(d,0,1);
+myPlot(d,0,2);
+myPlot(d,1,0);
+myPlot(d,1,1);
+myPlot(d,1,2);
 
+d=4;
+myPlot(d,0,0);
+myPlot(d,0,1);
+myPlot(d,0,2);
+myPlot(d,1,0);
+myPlot(d,1,1);
+myPlot(d,1,2);
 
+d=12;
+myPlot(d,0,0);
+myPlot(d,0,1);
+myPlot(d,0,2);
+myPlot(d,1,0);
+myPlot(d,1,1);
+myPlot(d,1,2);
 
-myPlot(1,0,0)
-myPlot(1,0,1)
 
 %data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
 function fig = myPlot(data_index, normalize, tl_bool)
-    fig = figure;
+    fig = figure('units','normalized','outerposition',[0 0 1 1]);
     workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
     hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
     hrv202 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part202\Time Based HRV Analyses By Trial.csv');
@@ -162,7 +188,7 @@ function fig = myPlot(data_index, normalize, tl_bool)
         if (tl_bool==1)
            
             gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
-        elseif (tl_bool==3)
+        elseif (tl_bool==2)
             gscatter(xfit,rm_wl_t(i,13:24),g);
         else
             gscatter(xfit,rm_wl_t(i,13:24),rm_wl_t(i,1:12));
@@ -217,8 +243,7 @@ function fig = myPlot(data_index, normalize, tl_bool)
     
         
     suptitle(titl);
-
-
+    saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
     
 end
 
