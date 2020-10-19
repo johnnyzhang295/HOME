@@ -1,40 +1,23 @@
 clear all;
-% 
-% d = 1;
-% myPlot(d,0,0);
-% myPlot(d,0,1);
-% myPlot(d,0,2);
-% myPlot(d,1,0);
-% myPlot(d,1,1);
-% myPlot(d,1,2);
-% 
-% d=2;
-% myPlot(d,0,0);
-% myPlot(d,0,1);
-% myPlot(d,0,2);
-% myPlot(d,1,0);
-% myPlot(d,1,1);
-% myPlot(d,1,2);
-% 
-% d=4;
-% myPlot(d,0,0);
-% myPlot(d,0,1);
-% myPlot(d,0,2);
-% myPlot(d,1,0);
-% myPlot(d,1,1);
-% myPlot(d,1,2);
-% 
-% d=12;
-% myPlot(d,0,0);
-% myPlot(d,0,1);
-% myPlot(d,0,2);
-% myPlot(d,1,0);
-% myPlot(d,1,1);
-% myPlot(d,1,2);
 
-myPlot(1,1,0,0,1);
+donk = [1 2 4 12];
+for d=donk
+    myPlot(d,0,0,1,0);
+    myPlot(d,0,1,1,0);
+    myPlot(d,0,2,1,0);
+    myPlot(d,1,0,1,0);
+    myPlot(d,1,1,1,0);
+    myPlot(d,1,2,1,0);
+    
+    myPlot(d,0,0,1,1);
+    myPlot(d,0,1,1,1);
+    myPlot(d,0,2,1,1);
+    myPlot(d,1,0,1,1);
+    myPlot(d,1,1,1,1);
+    myPlot(d,1,2,1,1);
+end
 
-%data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
+%set data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
 %set save to 1 if you want to save, 0 for no save and mostly debugging
