@@ -1,42 +1,45 @@
 clear all;
+% 
+% d = 1;
+% myPlot(d,0,0);
+% myPlot(d,0,1);
+% myPlot(d,0,2);
+% myPlot(d,1,0);
+% myPlot(d,1,1);
+% myPlot(d,1,2);
+% 
+% d=2;
+% myPlot(d,0,0);
+% myPlot(d,0,1);
+% myPlot(d,0,2);
+% myPlot(d,1,0);
+% myPlot(d,1,1);
+% myPlot(d,1,2);
+% 
+% d=4;
+% myPlot(d,0,0);
+% myPlot(d,0,1);
+% myPlot(d,0,2);
+% myPlot(d,1,0);
+% myPlot(d,1,1);
+% myPlot(d,1,2);
+% 
+% d=12;
+% myPlot(d,0,0);
+% myPlot(d,0,1);
+% myPlot(d,0,2);
+% myPlot(d,1,0);
+% myPlot(d,1,1);
+% myPlot(d,1,2);
 
-d = 1;
-myPlot(d,0,0);
-myPlot(d,0,1);
-myPlot(d,0,2);
-myPlot(d,1,0);
-myPlot(d,1,1);
-myPlot(d,1,2);
-
-d=2;
-myPlot(d,0,0);
-myPlot(d,0,1);
-myPlot(d,0,2);
-myPlot(d,1,0);
-myPlot(d,1,1);
-myPlot(d,1,2);
-
-d=4;
-myPlot(d,0,0);
-myPlot(d,0,1);
-myPlot(d,0,2);
-myPlot(d,1,0);
-myPlot(d,1,1);
-myPlot(d,1,2);
-
-d=12;
-myPlot(d,0,0);
-myPlot(d,0,1);
-myPlot(d,0,2);
-myPlot(d,1,0);
-myPlot(d,1,1);
-myPlot(d,1,2);
-
+myPlot(1,1,0,0,1);
 
 %data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
-function fig = myPlot(data_index, normalize, tl_bool)
+%set save to 1 if you want to save, 0 for no save and mostly debugging
+%set on to 1 if you want aggregate on, 0 for indivdiual plots
+function fig = myPlot(data_index, normalize, tl_bool, save, on)
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
     workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
     hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
@@ -179,12 +182,17 @@ function fig = myPlot(data_index, normalize, tl_bool)
     for i=1:12
 
         g = {tl_vs_data(i,1:12),rm_wl_t(i,1:12)};
-        subplot(2,6,i)
+        if (on ==0)
+            
+            subplot(2,6,i)
+        end
         xlim([1,12])
         hold on; %This hold on must come AFTER the subplot
         p = polyfit(xfit', rm_wl_t(i,13:24)',1);
         yfit = polyval(p,xfit);
-        plot(xfit,yfit,'HandleVisibility','off');
+        if (on ==0)
+            plot(xfit,yfit,'HandleVisibility','off');
+        end
         if (tl_bool==1)
            
             gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
@@ -212,14 +220,18 @@ function fig = myPlot(data_index, normalize, tl_bool)
         legend('Location','best')
         hold off;
     end
-    titl = 'Individual ';
+    if (on == 0)
+        titl = 'Individual ';
+    else
+        titl= 'Aggregate ';
+    end
     if (normalize == 0)
-        titl = strcat(titl, ' Raw Trial Order vs ');
+        titl = strcat(titl, ' Trial Order vs Raw ');
     elseif (normalize == 1)
 
-        titl = strcat(titl, ' Normalized Trial Order vs ');
+        titl = strcat(titl, ' Trial Order vs Normalized ');
     else
-        titl = strcat(titl, ' Change Score Trial Order vs ');   
+        titl = strcat(titl, ' Trial Order vs Change Score ');   
     end
     
     if (data_index == 1)
@@ -243,8 +255,16 @@ function fig = myPlot(data_index, normalize, tl_bool)
     
         
     suptitle(titl);
-    saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
-    
+    if (on == 1)
+        hold on;
+        p = polyfit(rm_wl(:,1), rm_wl(:,2),1);
+        yfit = polyval(p,xfit);
+        plot(xfit,yfit,'HandleVisibility','off');
+        
+    end
+    if (save==1)
+        saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
+    end
 end
 
 
