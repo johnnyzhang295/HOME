@@ -40,7 +40,8 @@ wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
 data_index = 1;
-normalize=2; %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
+normalize=1; %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
+tl_bool = 3; %set to 1 if you want taskload, 0 if you want workload, 3 if you want both
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
 rmssd202 = hrv202(:,data_index);
@@ -142,16 +143,22 @@ xs = 1:12;
 x_axis = repmat(xs,1,12);
 
 
-
 for i=1:12
     
+    g = {tl_vs_data(i,1:12),rm_wl_t(i,1:12)};
     subplot(2,6,i)
     xlim([1,12])
     hold on; %This hold on must come AFTER the subplot
     p = polyfit(xfit', rm_wl_t(i,13:24)',1);
     yfit = polyval(p,xfit);
     plot(xfit,yfit,'HandleVisibility','off');
-    gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
+    if (tl_bool==1)
+        gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
+    elseif (tl_bool==3)
+        gscatter(xfit,rm_wl_t(i,13:24),g);
+    else
+        gscatter(xfit,rm_wl_t(i,13:24),rm_wl_t(i,1:12));
+    end
     %scatter(xfit,rm_wl_t(i,13:24),'filled','MarkerFaceColor',rand(1,3))
     xlabel('Trial Order')
     if (normalize == 0)
@@ -168,8 +175,8 @@ for i=1:12
     grid minor;
     titl = strcat('Part',{' '},pnums(i,:),newline);
     title(titl);
-    legend('Location','northeast');
+    legend('Location','best')
     hold off;
 end
 
-suptitle('Individual Change Score Trial Order vs HR grouped by Taskload ')
+suptitle('Individual Normalized Trial Order vs pNN50 grouped by Taskload ')
