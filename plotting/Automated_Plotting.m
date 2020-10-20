@@ -2,21 +2,21 @@ clear all;
 
 donk = [1 2 4 12];
 for d=donk
-    myPlot(d,0,0,1,0);
-    myPlot(d,0,1,1,0);
-    myPlot(d,0,2,1,0);
-    myPlot(d,1,0,1,0);
-    myPlot(d,1,1,1,0);
-    myPlot(d,1,2,1,0);
+%     myPlot(d,0,0,1,0);
+%     myPlot(d,0,1,1,0);
+%     myPlot(d,0,2,1,0);
+%     myPlot(d,1,0,1,0);
+%     myPlot(d,1,1,1,0);
+%     myPlot(d,1,2,1,0);
     
-    myPlot(d,0,0,1,1);
-    myPlot(d,0,1,1,1);
-    myPlot(d,0,2,1,1);
-    myPlot(d,1,0,1,1);
-    myPlot(d,1,1,1,1);
-    myPlot(d,1,2,1,1);
+%     myPlot(d,0,0,1,1);
+%     myPlot(d,0,1,1,1);
+%     myPlot(d,0,2,1,1);
+%     myPlot(d,1,0,1,1);
+%     myPlot(d,1,1,1,1);
+%     myPlot(d,1,2,1,1);
 end
-
+myPlot(1,0,0,0,1);
 %set data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
@@ -161,7 +161,19 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
     xs = 1:12;
     x_axis = repmat(xs,1,12);
 
-
+    trial_ord = [1;2;3;4;5;6;7;8;9;10;11;12];
+    trial_vs_data = [trial_ord rmssd201;
+        trial_ord rmssd202;
+        trial_ord rmssd203;
+        trial_ord rmssd204;
+        trial_ord rmssd205;
+        trial_ord rmssd206;
+        trial_ord rmssd208;
+        trial_ord rmssd209;
+        trial_ord rmssd211;
+        trial_ord rmssd212;
+        trial_ord rmssd213;
+        trial_ord rmssd215;];
     for i=1:12
 
         g = {tl_vs_data(i,1:12),rm_wl_t(i,1:12)};
@@ -199,7 +211,9 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
         grid on;
         grid minor;
         titl = strcat('Part',{' '},pnums(i,:),newline);
-        title(titl);
+        if (on == 0)
+            title(titl);
+        end
         legend('Location','best')
         hold off;
     end
@@ -240,7 +254,7 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
     suptitle(titl);
     if (on == 1)
         hold on;
-        p = polyfit(rm_wl(:,1), rm_wl(:,2),1);
+        p = polyfit(trial_vs_data(:,1), trial_vs_data(:,2),1);
         yfit = polyval(p,xfit);
         plot(xfit,yfit,'HandleVisibility','off');
         
