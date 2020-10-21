@@ -32,7 +32,7 @@ X = [
     trial_order workload(2:end,15);
     ];
     
-data_index = 12; %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
+data_index = 1; %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 data201 = hrv201(:,data_index);
 data202 = hrv202(:,data_index);
 data203 = hrv203(:,data_index);
@@ -61,8 +61,22 @@ y = [
     data215;
     ];
 
-mdl = fitglm(X(1:12,:),y(1:12));
+j = 1;
+pnums = ['201';'202';'203';'204';'205';'206';'208';'209';'211';'212';'213';'215'];
+figure('units','normalized','outerposition',[0 0 1 1]);
 
-y_resp = predict(mdl,[X(1:12,:)]);
 
-scatter(y(1:12),y_resp);
+for i=1:12:144
+    subplot(3,4,j);
+    mdl = fitglm(X(i:i+11,:),y(i:i+11));
+    y_resp = predict(mdl,[X(i:i+11,:)]);
+    scatter(y(i:i+11),y_resp);
+    title(strcat('Part',{' '},pnums(j,:)));
+    %xlim([min(y)-5 max(y)+5]); %makes equal spaceing
+    %ylim([min(y)-5 max(y)+5]); %makes equal spacing
+    axis equal;  %If undo above 2, comment this line out you idoit!
+    grid on
+    grid minor
+    
+    j = j+1;
+end
