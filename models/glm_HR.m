@@ -70,6 +70,10 @@ for i=1:12:144
     subplot(3,4,j);
     mdl = fitglm(X(i:i+11,:),y(i:i+11));
     y_resp = predict(mdl,[X(i:i+11,:)]);
+    hold on;
+    p = polyfit(y(i:i+11),y_resp,1);
+    yfit = polyval(p,y(i:i+11));
+    plot(y(i:i+11),yfit,'--r','HandleVisibility','off');
     scatter(y(i:i+11),y_resp);
     title(strcat('Part',{' '},pnums(j,:)));
     %xlim([min(y)-5 max(y)+5]); %makes equal spaceing
@@ -80,3 +84,4 @@ for i=1:12:144
     
     j = j+1;
 end
+
