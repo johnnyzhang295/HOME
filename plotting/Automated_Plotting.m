@@ -1,28 +1,39 @@
 clear all;
 
 donk = [1 2 4 12];
-for d=donk
+
+%Scatterplots
+% for d=donk
 %     myPlot(d,0,0,1,0);
 %     myPlot(d,0,1,1,0);
 %     myPlot(d,0,2,1,0);
 %     myPlot(d,1,0,1,0);
 %     myPlot(d,1,1,1,0);
 %     myPlot(d,1,2,1,0);
-    
+%     
 %     myPlot(d,0,0,1,1);
 %     myPlot(d,0,1,1,1);
 %     myPlot(d,0,2,1,1);
 %     myPlot(d,1,0,1,1);
 %     myPlot(d,1,1,1,1);
 %     myPlot(d,1,2,1,1);
+% end
+
+%Boxplots
+for d=donk
+    myPlot(d,0,0,1,0,1);
+    myPlot(d,0,1,1,0,1);
 end
-myPlot(1,0,0,0,1);
+
+
+
 %set data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
 %set save to 1 if you want to save, 0 for no save and mostly debugging
-%set on to 1 if you want aggregate on, 0 for indivdiual plots
-function fig = myPlot(data_index, normalize, tl_bool, save, on)
+%set on to 1 if you want aggregate on, 0 for indivdiual plot
+%set boxplot to 1 if you want boxplots
+function fig = myPlot(data_index, normalize, tl_bool, save, on, boxplot_bool)
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
     workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
     hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
@@ -174,48 +185,74 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
         trial_ord rmssd212;
         trial_ord rmssd213;
         trial_ord rmssd215;];
-    for i=1:12
+    
+    if (boxplot_bool == 1 && on == 1)
+       myBoxplot;
+       
+    else
+    
+        for i=1:12
 
-        g = {tl_vs_data(i,1:12),rm_wl_t(i,1:12)};
-        if (on ==0)
-            
-            subplot(2,6,i)
-        end
-        xlim([1,12])
-        hold on; %This hold on must come AFTER the subplot
-        p = polyfit(xfit', rm_wl_t(i,13:24)',1);
-        yfit = polyval(p,xfit);
-        if (on ==0)
-            plot(xfit,yfit,'HandleVisibility','off');
-        end
-        if (tl_bool==1)
-           
-            gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
-        elseif (tl_bool==2)
-            gscatter(xfit,rm_wl_t(i,13:24),g);
-        else
-            gscatter(xfit,rm_wl_t(i,13:24),rm_wl_t(i,1:12));
-        end
-        
-        xlabel('Trial Order')
-        if (normalize == 0)
+            g = {tl_vs_data(i,1:12),rm_wl_t(i,1:12)};
+            if (on ==0)
 
-            ylabel('Raw Values')
-        elseif (normalize == 1)
+                subplot(2,6,i)
+            end
+            xlim([1,12])
+            hold on; %This hold on must come AFTER the subplot
+            p = polyfit(xfit', rm_wl_t(i,13:24)',1);
+            yfit = polyval(p,xfit);
+            if (on ==0 && boxplot_bool == 0)
+                plot(xfit,yfit,'HandleVisibility','off');
+            end
+            if (tl_bool==1)
+                if (boxplot_bool == 1)
+                    boxplot(tl_vs_data(i,13:24),tl_vs_data(i,1:12));
+                else
+                    gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
+                end
+            elseif (tl_bool==2)
+                
+                gscatter(xfit,rm_wl_t(i,13:24),g);
+                
+            else
+                if (boxplot_bool == 1)
+                    boxplot(rm_wl_t(i,13:24),rm_wl_t(i,1:12));
+                    
+                else
+                    gscatter(xfit,rm_wl_t(i,13:24),rm_wl_t(i,1:12));
+                end
+            end
 
-            ylabel('Normalized')
-        else
-            ylabel('Change Score')        
-        end
+            xlabel('Trial Order')
+            if (boxplot_bool ==1)
+                if (tl_bool == 0)
+                    xlabel('Workload Rating');
+                else
+                    xlabel('Taskload Level');
+                end
+            end
+            if (normalize == 0)
 
-        grid on;
-        grid minor;
-        titl = strcat('Part',{' '},pnums(i,:),newline);
-        if (on == 0)
-            title(titl);
+                ylabel('Raw Values')
+            elseif (normalize == 1)
+
+                ylabel('Normalized')
+            else
+                ylabel('Change Score')        
+            end
+
+            grid on;
+            grid minor;
+            titl = strcat('Part',{' '},pnums(i,:),newline);
+            if (on == 0)
+                title(titl);
+            end
+            if (boxplot_bool == 0)
+                legend('Location','best')
+            end
+            hold off;
         end
-        legend('Location','best')
-        hold off;
     end
     if (on == 0)
         titl = 'Individual ';
@@ -227,9 +264,18 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
     elseif (normalize == 1)
 
         titl = strcat(titl, ' Trial Order vs Normalized ');
+    
     else
         titl = strcat(titl, ' Trial Order vs Change Score ');   
     end
+    if (boxplot_bool ==1)
+        if (tl_bool == 0)
+            titl = ('Individual Workload Rating vs ');
+        else
+            titl = ('Indivdual Taskload Level vs ');
+        end
+    end
+       
     
     if (data_index == 1)
         titl = strcat(titl,' HR');
@@ -250,9 +296,17 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
         titl=strcat(titl,' grouped by TL, WL');
     end
     
+    if (boxplot_bool ==1)
+        titl = strcat(titl,' boxplotted');
+    elseif(boxplot_bool==0)
+        titl = strcat(titl,' boxplotted');
+    else
+        titl=strcat(titl,' boxplotted');
+    end
+    
         
     suptitle(titl);
-    if (on == 1)
+    if (on == 1 && boxplot_bool == 0 )
         hold on;
         p = polyfit(trial_vs_data(:,1), trial_vs_data(:,2),1);
         yfit = polyval(p,xfit);
@@ -262,7 +316,28 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on)
     if (save==1)
         saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
     end
+    
+    
+    function myBoxplot
+        data = [taskload(1,:)' rmssd201;
+        taskload(2,:)' rmssd202;
+        taskload(3,:)' rmssd203;
+        taskload(4,:)' rmssd204;
+        taskload(5,:)' rmssd205;
+        taskload(6,:)' rmssd206;
+        taskload(8,:)' rmssd208;
+        taskload(9,:)' rmssd209;
+        taskload(11,:)' rmssd211;
+        taskload(12,:)' rmssd212;
+        taskload(13,:)' rmssd213;
+        taskload(15,:)' rmssd215;];
+        x=data(:,2);
+        g=data(:,1);
+        fig = boxplot(x,g);
+
+    end
 end
+
 
 
 
