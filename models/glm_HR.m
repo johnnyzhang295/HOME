@@ -37,11 +37,13 @@ X_tl = [
 
 X_wl_and_tl = [X_wl X_tl(:,2)];
 
-myModel(X_wl,1,0,1,1,1);
-myModel(X_tl,1,1,0,1,1);
-myModel(X_wl_and_tl,1,1,1,1,1);
-myModel(X_wl(:,1),1,0,0,1,1);
-
+donk = [1 2 4 12];
+for d=donk
+    myModel(X_wl,d,0,1,1,1);
+    myModel(X_tl,d,1,0,1,1);
+    myModel(X_wl_and_tl,d,1,1,1,1);
+    myModel(X_wl(:,1),d,0,0,1,1);
+end
 
 %data_index is 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %tl_bool set to 1 if taskload included as predictor variable
@@ -95,7 +97,8 @@ function mdl = myModel(X,data_index,tl_bool,wl_bool,save,trial_bool)
     pnums = ['201';'202';'203';'204';'205';'206';'208';'209';'211';'212';'213';'215'];
     figure('units','normalized','outerposition',[0 0 1 1]);
 
-
+    sum_aic =0;
+    sum_bic = 0;
     for i=1:12:144
         subplot(3,4,j);
         mdl = fitglm(X(i:i+11,:),y(i:i+11));
@@ -113,6 +116,12 @@ function mdl = myModel(X,data_index,tl_bool,wl_bool,save,trial_bool)
         grid minor
         xlabel('Subject Data');
         ylabel('Model Response');
+        
+        [aic,bic] = aicbic(mdl.LogLikelihood,mdl.NumPredictors,mdl.NumObservations);
+        sum_aic = sum_aic + aic;
+        sum_bic = sum_bic + bic;
+        
+        
         j = j+1;
     end
     titl = '';
@@ -134,8 +143,14 @@ function mdl = myModel(X,data_index,tl_bool,wl_bool,save,trial_bool)
     else
         titl = strcat(titl, ' Model pNN50 Response');
     end
+    aic_label = char(string(sum_aic));
+    aic_label = aic_label(1:end-2);
+    bic_label = char(string(sum_bic));
+    bic_label = bic_label(1:end-2);
+    aicbic_vals = strcat('     AIC:',aic_label,'     BIC:',bic_label);
+    titl2 = strcat(titl,aicbic_vals);
+    suptitle(titl2);
     
-    suptitle(titl);
     
     if (save==1)
         saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
