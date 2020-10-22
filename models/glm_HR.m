@@ -38,12 +38,13 @@ X_tl = [
 X_wl_and_tl = [X_wl X_tl(:,2)];
 
 donk = [1 2 4 12];
-for d=donk
-    myModel(X_wl,d,0,1,1,1);
-    myModel(X_tl,d,1,0,1,1);
-    myModel(X_wl_and_tl,d,1,1,1,1);
-    myModel(X_wl(:,1),d,0,0,1,1);
-end
+% for d=donk
+%     myModel(X_wl,d,0,1,1,1);
+%     myModel(X_tl,d,1,0,1,1);
+%     myModel(X_wl_and_tl,d,1,1,1,1);
+%     myModel(X_wl(:,1),d,0,0,1,1);
+% end
+m = myModel(X_tl,1,1,0,0,1);
 
 %data_index is 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %tl_bool set to 1 if taskload included as predictor variable
@@ -117,7 +118,7 @@ function mdl = myModel(X,data_index,tl_bool,wl_bool,save,trial_bool)
         xlabel('Subject Data');
         ylabel('Model Response');
         
-        [aic,bic] = aicbic(mdl.LogLikelihood,mdl.NumPredictors,mdl.NumObservations);
+        [aic,bic] = aicbic(mdl.LogLikelihood,mdl.NumEstimatedCoefficients,mdl.NumObservations);
         sum_aic = sum_aic + aic;
         sum_bic = sum_bic + bic;
         
