@@ -1,10 +1,13 @@
 clear workspace;
 clear all;
 
+donk = [1 2 4 12];
+% for d=donk
+%     mdl = myWorkloadModel(d,1);
+% end
+m = myWorkloadModel(1,0);
 
-m = myWorkloadModel(1);
-
-function mdl = myWorkloadModel(data_index)
+function mdl = myWorkloadModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
     
     [trial_order, tl,y,wl] = loadData();
@@ -43,6 +46,10 @@ function mdl = myWorkloadModel(data_index)
     end
     
     MakeBigGraphPretty();
+    
+    if (save==1)
+        saveGraph()
+    end
     %All formating related shit goes here
     function MakeGraphPretty()
         subplot(3,4,j);
@@ -164,5 +171,9 @@ function mdl = myWorkloadModel(data_index)
         data213;
         data215;
         ];
+    end
+    function saveGraph()
+        saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
+    
     end
 end
