@@ -165,4 +165,8 @@ function mdl = myWorkloadModel(data_index)
         data215;
         ];
     end
+    function saveGraph()
+        saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',titl,'.jpg'));
+    
+    end
 end
