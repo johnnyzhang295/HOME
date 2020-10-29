@@ -5,7 +5,7 @@ donk = [1 2 4 12];
 % for d=donk
 %     mdl = myWorkloadModel(d,1);
 % end
-m = myWorkloadModel([1 4 12],1);
+m = myWorkloadModel([1 4 12],0);
 
 function mdl = myWorkloadModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
@@ -20,8 +20,8 @@ function mdl = myWorkloadModel(data_index,save)
     sum_aic =0;
     sum_bic = 0;
     for i=1:12:144
-        MakeGraphPretty();
         
+        MakeGraphPretty();
         dataTable = table(trial_order, tl(i:i+11), y(i:i+11, 1),...
             y(i:i+11, 2), y(i:i+11, 3),wl(i:i+11), 'VariableNames',...
             {'TrialOrder','Taskload','HR','SDNN','pNN50','Workload'});
@@ -41,6 +41,12 @@ function mdl = myWorkloadModel(data_index,save)
            saveCoeff(); 
         end
         
+        r_sq = char(string(mdl.Rsquared.Adjusted));
+        r_sq = r_sq(1:5);
+        title(strcat('Part',{' '},pnums(j,:),' Adjusted R-Squared: ',r_sq));
+        
+        
+        
         j = j+1;
     end
     
@@ -55,7 +61,6 @@ function mdl = myWorkloadModel(data_index,save)
         grid on;
         grid minor;
         hold on;
-        title(strcat('Part',{' '},pnums(j,:)));
         
         xlabel('Subject Workload');
         ylabel('Model Response');
