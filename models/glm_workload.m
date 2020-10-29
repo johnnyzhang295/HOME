@@ -5,7 +5,7 @@ donk = [1 2 4 12];
 % for d=donk
 %     mdl = myWorkloadModel(d,1);
 % end
-m = myWorkloadModel([1 4 12],0);
+m = myWorkloadModel([1 4 12],1);
 
 function mdl = myWorkloadModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
@@ -25,8 +25,9 @@ function mdl = myWorkloadModel(data_index,save)
         dataTable = table(trial_order, tl(i:i+11), y(i:i+11, 1),...
             y(i:i+11, 2), y(i:i+11, 3),wl(i:i+11), 'VariableNames',...
             {'TrialOrder','Taskload','HR','SDNN','pNN50','Workload'});
-        mdl = fitglm(dataTable,'Workload~TrialOrder + Taskload +HR *SDNN * pNN50',...
-            'ResponseVar','Workload','Intercept',true);
+        mdl = fitglm(dataTable,'Workload~TrialOrder * Taskload +HR *SDNN * pNN50',...
+           'ResponseVar','Workload','Intercept',true);
+        
         scatter(wl(i:i+11),mdl.Fitted.Response);
         p = polyfit(wl(i:i+11),mdl.Fitted.Response,1);
         yfit = polyval(p,wl(i:i+11));
@@ -58,10 +59,10 @@ function mdl = myWorkloadModel(data_index,save)
         
         xlabel('Subject Workload');
         ylabel('Model Response');
-         axis equal;
+        axis equal;
     end
     function MakeBigGraphPretty()
-        titl = 'WL ~ B0 + TrialOrd + TL + HR * SDNN * pNN50    Model';
+        titl = 'WL ~ B0 + TrialOrd * TL + HR * SDNN * pNN50    Model';
         aic_label = char(string(sum_aic));
         aic_label = aic_label(1:end-2);
         bic_label = char(string(sum_bic));
