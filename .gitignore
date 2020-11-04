@@ -9,3 +9,4 @@ plotting/.ipynb_checkpoints/*
 figures/*
 *.asv
 models/model coefficeints/*
+models/model figures/*
