@@ -5,12 +5,12 @@ donk = [1 2 4 12];
 % for d=donk
 %     mdl = myWorkloadModel(d,1);
 % end
-m = myWorkloadModel([1 4 12 23],1);
+m = mySARTModel([1 4 12 23],0);
 
-function mdl = myWorkloadModel(data_index,save)
+function mdl = mySARTModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
     
-    [trial_order, tl,y,wl] = loadData();
+    [trial_order, tl,y,sart] = loadData();
 
   
     
@@ -23,16 +23,15 @@ function mdl = myWorkloadModel(data_index,save)
         
         MakeGraphPretty();
         dataTable = table(trial_order, tl(i:i+11), y(i:i+11, 1),...
-            y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4),wl(i:i+11), 'VariableNames',...
-            {'TrialOrder','Taskload','HR','SDNN','pNN50','HFn','Workload'});
-        mdl = fitglm(dataTable,...,
-            'Workload~ HR+SDNN+pNN50+HFn + HR:pNN50 + SDNN:pNN50 + HR:HFn + SDNN:HFn + pNN50:HFn + SDNN:pNN50:HFn + TrialOrder + Taskload',...
-           'ResponseVar','Workload','Intercept',true);
+            y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4),sart(i:i+11), 'VariableNames',...
+            {'TrialOrder','Taskload','HR','SDNN','pNN50','HFn','SART'});
+        mdl = stepwiseglm(dataTable,'SART~ TrialOrder * Taskload * HR*SDNN*pNN50*HFn',...
+           'ResponseVar','SART','Intercept',true,'Criterion','bic');
         
-        scatter(wl(i:i+11),mdl.Fitted.Response);
-        p = polyfit(wl(i:i+11),mdl.Fitted.Response,1);
-        yfit = polyval(p,wl(i:i+11));
-        plot(wl(i:i+11),yfit,'-r','HandleVisibility','off');
+        scatter(sart(i:i+11),mdl.Fitted.Response);
+        p = polyfit(sart(i:i+11),mdl.Fitted.Response,1);
+        yfit = polyval(p,sart(i:i+11));
+        plot(sart(i:i+11),yfit,'-r','HandleVisibility','off');
         
         %[aic,bic] = aicbic(mdl.LogLikelihood,mdl.NumEstimatedCoefficients,mdl.NumObservations);
         sum_aic = sum_aic + mdl.ModelCriterion.AIC;
@@ -66,12 +65,12 @@ function mdl = myWorkloadModel(data_index,save)
         grid minor;
         hold on;
         
-        xlabel('Subject Workload');
+        xlabel('Subject SART Score');
         ylabel('Model Response');
         axis equal;
     end
     function MakeBigGraphPretty()
-        titl = 'WL ~ [B0 + TrialOrd, TL, HR, SDNN, pNN50, HFn]    Model';
+        titl = 'SART ~ [B0 + TrialOrd, TL, HR, SDNN, pNN50, HFn]    Model';
         aic_label = char(string(sum_aic));
         aic_label = aic_label(1:end-2);
         bic_label = char(string(sum_bic));
@@ -81,7 +80,7 @@ function mdl = myWorkloadModel(data_index,save)
         suptitle(titl2);
     
     end
-    function [trial_order,tl,y,wl] = loadData()
+    function [trial_order,tl,y,sart] = loadData()
 
         workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
         taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
@@ -100,26 +99,10 @@ function mdl = myWorkloadModel(data_index,save)
         hrv213 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part213\Time Based HRV Analyses By Trial.csv');
         hrv214 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part214\Time Based HRV Analyses By Trial.csv');
         hrv215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Time Based HRV Analyses By Trial.csv');
+        sart = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\SARTScores.txt');
         trial_order = [1 2 3 4 5 6 7 8 9 10 11 12]';
 
 
-        wl = [
-             workload(2:end,1);
-             workload(2:end,2);
-             workload(2:end,3);
-             workload(2:end,4);
-             workload(2:end,5);
-             workload(2:end,6);
-             workload(2:end,7);
-             workload(2:end,8);
-             workload(2:end,9);
-             workload(2:end,10);
-             workload(2:end,11);
-             workload(2:end,12);
-             workload(2:end,13);
-             workload(2:end,14);
-             workload(2:end,15);
-            ];
 
         tl = [
              taskload(1,:)';
