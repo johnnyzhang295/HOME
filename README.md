@@ -8,12 +8,12 @@ You should set up your file structure like so:
 
 ```.
 |---- Parent Dir
-|     |---- data
-|           |---- partXX
-|                 |---- partXX.acq
-|           |---- partXY
-|                 |---- partXY.acq
 |     |---- HOME Github Repo
+|          |---- data
+|                 |---- partXX
+|                       |---- partXX.acq
+|                 |---- partXY
+|                       |---- partXY.acq
 
 ```
 
