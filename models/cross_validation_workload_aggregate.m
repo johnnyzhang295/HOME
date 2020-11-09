@@ -36,111 +36,70 @@ b212 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part212\Baseline Time 
 b213 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part213\Baseline Time Based HRV Analyses By Trial.csv');
 b214 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part214\Baseline Time Based HRV Analyses By Trial.csv');
 b215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Baseline Time Based HRV Analyses By Trial.csv');
+pnums = ['201';'202';'203';'204';'205';'206'; '207';'208';'209';'210';'211';'212';'213';'214';'215'];
+
+donk= [1 4 12];
+data= cell(12,1);
+data(1,:) = {hrv201(:,donk)./b201(donk)};
+data(2,:) = {hrv202(:,donk)./b202(donk)};
+data(3,:) = {hrv203(:,donk)./b203(donk)};
+data(4,:) = {hrv204(:,donk)./b204(donk)};
+data(5,:) = {hrv205(:,donk)./b205(donk)};
+data(6,:) = {hrv206(:,donk)./b206(donk)};
+data(7,:) = {hrv207(:,donk)./b207(donk)};
+data(8,:) = {hrv208(:,donk)./b208(donk)};
+data(9,:) = {hrv209(:,donk)./b209(donk)};
+data(10,:) = {hrv210(:,donk)./b210(donk)};
+data(11,:) = {hrv211(:,donk)./b211(donk)};
+data(12,:) = {hrv212(:,donk)./b212(donk)};
+data(13,:) = {hrv213(:,donk)./b213(donk)};
+data(14,:) = {hrv214(:,donk)./b214(donk)};
+data(15,:) = {hrv215(:,donk)./b215(donk)};
 
 
-wl = [
-     workload(2:end,1);
-     workload(2:end,2);
-     workload(2:end,3);
-     workload(2:end,4);
-     workload(2:end,5);
-     workload(2:end,6);
-     
-     workload(2:end,7);
-     workload(2:end,8);
-     workload(2:end,9);
-     
-     workload(2:end,10);
-     workload(2:end,11);
-     workload(2:end,12);
-     workload(2:end,13);
-     
-     workload(2:end,14);
-     workload(2:end,15);
-    ];
-
-tl = [
-     taskload(1,:)';
-     taskload(2,:)';
-     taskload(3,:)';
-     taskload(4,:)';
-     taskload(5,:)';
-     taskload(6,:)';
-     taskload(7,:)';
-     taskload(8,:)';
-     taskload(9,:)';
-     taskload(10,:)';
-     taskload(11,:)';
-     taskload(12,:)';
-     taskload(13,:)';
-     taskload(14,:)';
-     taskload(15,:)';
-    ];
-
-
-x_ax= [(1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-   (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    (1:10)';
-    
-    (1:10)';
-    ];
-
-t = [trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;
-trial_order;];
-
-donk= [1 4 12 23];
-data= [];
-for d=donk
-    data = horzcat(data, [hrv201(:,d)/b201(d);
-    hrv202(:,d)/b202(d);
-    hrv203(:,d)/b203(d);
-    hrv204(:,d)/b204(d);
-    hrv205(:,d)/b205(d);
-    hrv206(:,d)/b206(d);
-    hrv207(:,d)/b207(d);
-    hrv208(:,d)/b208(d);
-    hrv209(:,d)/b209(d);
-    hrv210(:,d)/b210(d);
-    hrv211(:,d)/b211(d);
-    hrv212(:,d)/b212(d);
-    hrv213(:,d)/b213(d);
-    hrv214(:,d)/b214(d);
-    hrv215(:,d)/b215(d);]);
+wl = zeros(12,15);
+tl = zeros(12,15);
+x_ax = zeros(10,15);
+t = zeros(12,15);
+leaveout = 7;
+subj_data = zeros(12, 6);
+for z=1:15
+    if (z == leaveout)
+        
+        subj_data(:,3:5) = data{z};
+        data(z) = [];
+        subj_data(:,1) = (1:12)';
+        subj_data(:,2) = taskload(z,:)';
+        subj_data(:,6) = workload(2:end,z);
+        continue
+    end
+    wl(:,z) = workload(2:end,z);
+    tl(:,z) = taskload(z,:)';
+    x_ax(:,z) = (1:10)';
+    t(:,z) = (1:12)';
 end
 
+wl = wl(wl>0);
+tl = tl(tl>0);
+x_ax = x_ax(x_ax>0);
+t = t(t>0);
+data = cell2mat(data);
 data(isinf(data)) = 0;
 
 
 tabl = table(t,tl,data(:,1),data(:,2),data(:,3),wl,...
     'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','wl'});
+%HR*HFn+SDNN*pNN50+HR:pNN50+SDNN:HFn+pNN50:HFn+SDNN:pNN50:HFn+TrialOrder+Taskload
+% mdl = fitglm(tabl,...,
+%     'wl~1 + TrialOrder*Taskload + TrialOrder*HR + Taskload*HR + TrialOrder*SDNN + Taskload*SDNN + HR*SDNN + TrialOrder*pNN50 + Taskload*pNN50 + HR*pNN50 + SDNN*pNN50 + TrialOrder:Taskload:SDNN + TrialOrder:HR:SDNN + Taskload:HR:SDNN + TrialOrder:Taskload:pNN50 + TrialOrder:HR:pNN50 + TrialOrder:SDNN:pNN50 + Taskload:SDNN:pNN50 + HR:SDNN:pNN50 + TrialOrder:Taskload:SDNN:pNN50 + TrialOrder:HR:SDNN:pNN50',...,
+%     'ResponseVar','wl','Intercept',true);
 
-mdl = stepwiseglm(tabl,'wl~TrialOrder*Taskload+HR*SDNN*pNN50','ResponseVar','wl','Intercept',true,...
-    'Criterion','aic');
-figure;
+mdl = fitglm(tabl,...,
+    'wl ~ 1 + TrialOrder*HR + Taskload*HR + SDNN*pNN50',...,
+    'ResponseVar','wl','Intercept', true);
+
+
+figure('units','normalized','outerposition',[0 0 1 1]);
 scatter(wl,mdl.Fitted.Response);
 ylim([1 10]);
 hold on;
@@ -152,5 +111,35 @@ ylabel('Model Response')
 p = polyfit(wl,mdl.Fitted.Response,1);
 yfit = polyval(p,wl);
 plot(wl,yfit,'-r','HandleVisibility','off');
+grid on;
+grid minor;
+title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
+title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_1,'.jpg'));
+    
+
+
+figure('units','normalized','outerposition',[0 0 1 1]);
+hold on;
+x = subj_data(:,6);
+y = mdl.predict(subj_data(:,1:5));
+scatter(x, y,80,'filled');
+xlabel('Subjective Workload')
+ylabel('Model Response')
+p = polyfit(x,y,1);
+grid on;
+grid minor;
+yfit = polyval(p, x);
+plot(x, yfit,'-r','HandleVisibility','off');
+
+
+mean_err = mean(x - y);
+std_err = std(x - y);
+title_2 = strcat('Model Prediction for Subj ',{' '},string(pnums(leaveout,:)));
+title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
+saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_2,'.jpg'));
+
+
 mdl
-title(strcat('Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC),'    AIC: ',string(mdl.ModelCriterion.AIC)));
+display(mean_err);
+display(std_err);
