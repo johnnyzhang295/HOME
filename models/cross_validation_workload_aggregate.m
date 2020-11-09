@@ -132,14 +132,16 @@ grid minor;
 yfit = polyval(p, x);
 plot(x, yfit,'-r','HandleVisibility','off');
 
-
-mean_err = mean(x - y);
-std_err = std(x - y);
+diff = x-y;
+mean_err = mean(diff);
+std_err = std(diff);
 title_2 = strcat('Model Prediction for Subj ',{' '},string(pnums(leaveout,:)));
 title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
 saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_2,'.jpg'));
 
-
+fn = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model coefficeints\LOOCV coefficients\',title_1,'modelCoefficients.txt');
+writetable(mdl.Coefficients, fn, 'WriteRowNames',true);
 mdl
 display(mean_err);
 display(std_err);
+display(sse(diff));
