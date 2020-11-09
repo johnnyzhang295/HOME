@@ -60,10 +60,10 @@ wl = zeros(12,15);
 tl = zeros(12,15);
 x_ax = zeros(10,15);
 t = zeros(12,15);
-
+leaveout = 7;
 subj_data = zeros(12, 6);
 for z=1:15
-    if (z == 7)
+    if (z == leaveout)
         
         subj_data(:,3:5) = data{z};
         data(z) = [];
@@ -98,7 +98,7 @@ mdl = fitglm(tabl,...,
     'ResponseVar','wl','Intercept', true);
 
 
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 scatter(wl,mdl.Fitted.Response);
 ylim([1 10]);
 hold on;
@@ -110,5 +110,30 @@ ylabel('Model Response')
 p = polyfit(wl,mdl.Fitted.Response,1);
 yfit = polyval(p,wl);
 plot(wl,yfit,'-r','HandleVisibility','off');
-
+grid on;
+grid minor;
 title(strcat('Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+
+
+figure('units','normalized','outerposition',[0 0 1 1]);
+hold on;
+x = subj_data(:,6);
+y = mdl.predict(subj_data(:,1:5));
+scatter(x, y,80,'filled');
+xlabel('Subjective Workload')
+ylabel('Model Response')
+p = polyfit(x,y,1);
+grid on;
+grid minor;
+yfit = polyval(p, x);
+plot(x, yfit,'-r','HandleVisibility','off');
+
+pnums = ['201';'202';'203';'204';'205';'206'; '207';'208';'209';'210';'211';'212';'213';'214';'215'];
+mean_err = mean(x - y);
+std_err = std(x - y);
+title(strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)),' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
+
+
+mdl
+display(mean_err);
+display(std_err);
