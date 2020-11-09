@@ -61,7 +61,7 @@ tl = zeros(12,15);
 x_ax = zeros(10,15);
 t = zeros(12,15);
 for z=1:15
-    if (z == 4)
+    if (z == 1)
         data(z) = [];
         continue
     end
@@ -82,9 +82,15 @@ data(isinf(data)) = 0;
 tabl = table(t,tl,data(:,1),data(:,2),data(:,3),wl,...
     'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','wl'});
 %HR*HFn+SDNN*pNN50+HR:pNN50+SDNN:HFn+pNN50:HFn+SDNN:pNN50:HFn+TrialOrder+Taskload
+% mdl = fitglm(tabl,...,
+%     'wl~1 + TrialOrder*Taskload + TrialOrder*HR + Taskload*HR + TrialOrder*SDNN + Taskload*SDNN + HR*SDNN + TrialOrder*pNN50 + Taskload*pNN50 + HR*pNN50 + SDNN*pNN50 + TrialOrder:Taskload:SDNN + TrialOrder:HR:SDNN + Taskload:HR:SDNN + TrialOrder:Taskload:pNN50 + TrialOrder:HR:pNN50 + TrialOrder:SDNN:pNN50 + Taskload:SDNN:pNN50 + HR:SDNN:pNN50 + TrialOrder:Taskload:SDNN:pNN50 + TrialOrder:HR:SDNN:pNN50',...,
+%     'ResponseVar','wl','Intercept',true);
+
 mdl = fitglm(tabl,...,
-    'wl~1 + TrialOrder*Taskload + TrialOrder*HR + Taskload*HR + TrialOrder*SDNN + Taskload*SDNN + HR*SDNN + TrialOrder*pNN50 + Taskload*pNN50 + HR*pNN50 + SDNN*pNN50 + TrialOrder:Taskload:SDNN + TrialOrder:HR:SDNN + Taskload:HR:SDNN + TrialOrder:Taskload:pNN50 + TrialOrder:HR:pNN50 + TrialOrder:SDNN:pNN50 + Taskload:SDNN:pNN50 + HR:SDNN:pNN50 + TrialOrder:Taskload:SDNN:pNN50 + TrialOrder:HR:SDNN:pNN50',...,
-    'ResponseVar','wl','Intercept',true);
+    'wl ~ 1 + TrialOrder*HR + Taskload*HR + SDNN*pNN50',...,
+    'ResponseVar','wl','Intercept', true);
+
+
 figure;
 scatter(wl,mdl.Fitted.Response);
 ylim([1 10]);

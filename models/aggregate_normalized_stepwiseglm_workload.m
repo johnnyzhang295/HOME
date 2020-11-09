@@ -1,6 +1,6 @@
 clear workspace;
 clear all;
-workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
+workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\Workload.csv');
 taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
 hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
 hrv202 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part202\Time Based HRV Analyses By Trial.csv');
@@ -135,11 +135,11 @@ end
 data(isinf(data)) = 0;
 
 
-tabl = table(t,tl,data(:,1),data(:,2),data(:,3),data(:,4),wl,...
-    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','HFn','wl'});
+tabl = table(t,tl,data(:,1),data(:,2),data(:,3),wl,...
+    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','wl'});
 
-mdl = stepwiseglm(tabl,'wl~TrialOrder*Taskload*HR*SDNN*pNN50*HFn','ResponseVar','wl','Intercept',true,...
-    'Criterion','sse');
+mdl = stepwiseglm(tabl,'wl~TrialOrder*Taskload+HR*SDNN*pNN50','ResponseVar','wl','Intercept',true,...
+    'Criterion','aic');
 figure;
 scatter(wl,mdl.Fitted.Response);
 ylim([1 10]);
@@ -152,5 +152,5 @@ ylabel('Model Response')
 p = polyfit(wl,mdl.Fitted.Response,1);
 yfit = polyval(p,wl);
 plot(wl,yfit,'-r','HandleVisibility','off');
-
-title(strcat('Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+mdl
+title(strcat('Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC),'    AIC: ',string(mdl.ModelCriterion.AIC)));
