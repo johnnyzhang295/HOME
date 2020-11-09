@@ -36,6 +36,7 @@ b212 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part212\Baseline Time 
 b213 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part213\Baseline Time Based HRV Analyses By Trial.csv');
 b214 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part214\Baseline Time Based HRV Analyses By Trial.csv');
 b215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Baseline Time Based HRV Analyses By Trial.csv');
+pnums = ['201';'202';'203';'204';'205';'206'; '207';'208';'209';'210';'211';'212';'213';'214';'215'];
 
 donk= [1 4 12];
 data= cell(12,1);
@@ -112,7 +113,10 @@ yfit = polyval(p,wl);
 plot(wl,yfit,'-r','HandleVisibility','off');
 grid on;
 grid minor;
-title(strcat('Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
+title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_1,'.jpg'));
+    
 
 
 figure('units','normalized','outerposition',[0 0 1 1]);
@@ -128,10 +132,12 @@ grid minor;
 yfit = polyval(p, x);
 plot(x, yfit,'-r','HandleVisibility','off');
 
-pnums = ['201';'202';'203';'204';'205';'206'; '207';'208';'209';'210';'211';'212';'213';'214';'215'];
+
 mean_err = mean(x - y);
 std_err = std(x - y);
-title(strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)),' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
+title_2 = strcat('Model Prediction for Subj ',{' '},string(pnums(leaveout,:)));
+title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
+saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_2,'.jpg'));
 
 
 mdl
