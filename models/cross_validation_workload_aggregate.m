@@ -56,16 +56,17 @@ data(13,:) = {hrv213(:,donk)./b213(donk)};
 data(14,:) = {hrv214(:,donk)./b214(donk)};
 data(15,:) = {hrv215(:,donk)./b215(donk)};
 
+leaveout = 1;
 
 wl = zeros(12,15);
 tl = zeros(12,15);
 x_ax = zeros(10,15);
 t = zeros(12,15);
-leaveout = 7;
 subj_data = zeros(12, 6);
 for z=1:15
     if (z == leaveout)
         
+        data{z}(isinf(data{z})) = 0;
         subj_data(:,3:5) = data{z};
         data(z) = [];
         subj_data(:,1) = (1:12)';
@@ -117,7 +118,8 @@ title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
 title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
 saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_1,'.jpg'));
     
-
+fn = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model coefficeints\LOOCV coefficients\',title_1,'modelCoefficients.txt');
+writetable(mdl.Coefficients, fn, 'WriteRowNames',true);
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 hold on;
@@ -136,12 +138,13 @@ diff = x-y;
 mean_err = mean(diff);
 std_err = std(diff);
 title_2 = strcat('Model Prediction for Subj ',{' '},string(pnums(leaveout,:)));
-title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err)));
+
+se = sse(diff);
+title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err),' SSE: ',string(se)));
 saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_2,'.jpg'));
 
-fn = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model coefficeints\LOOCV coefficients\',title_1,'modelCoefficients.txt');
-writetable(mdl.Coefficients, fn, 'WriteRowNames',true);
+
 mdl
 display(mean_err);
 display(std_err);
-display(sse(diff));
+display(se);
