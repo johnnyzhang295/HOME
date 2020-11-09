@@ -60,9 +60,16 @@ wl = zeros(12,15);
 tl = zeros(12,15);
 x_ax = zeros(10,15);
 t = zeros(12,15);
+
+subj_data = zeros(12, 6);
 for z=1:15
-    if (z == 1)
+    if (z == 7)
+        
+        subj_data(:,3:5) = data{z};
         data(z) = [];
+        subj_data(:,1) = (1:12)';
+        subj_data(:,2) = taskload(z,:)';
+        subj_data(:,6) = workload(2:end,z);
         continue
     end
     wl(:,z) = workload(2:end,z);
