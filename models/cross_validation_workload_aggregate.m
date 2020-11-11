@@ -38,6 +38,9 @@ b214 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part214\Baseline Time 
 b215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Baseline Time Based HRV Analyses By Trial.csv');
 pnums = ['201';'202';'203';'204';'205';'206'; '207';'208';'209';'210';'211';'212';'213';'214';'215'];
 
+cmaawards = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\sex_age.txt');
+
+
 donk= [1 4 12];
 data= cell(12,1);
 data(1,:) = {hrv201(:,donk)./b201(donk)};
@@ -55,14 +58,34 @@ data(12,:) = {hrv212(:,donk)./b212(donk)};
 data(13,:) = {hrv213(:,donk)./b213(donk)};
 data(14,:) = {hrv214(:,donk)./b214(donk)};
 data(15,:) = {hrv215(:,donk)./b215(donk)};
-
 leaveout = 1;
+
+age_sex = zeros(180,2);
+age_sex = ...
+[repmat(cmaawards(1,:),[12,1]);
+ repmat(cmaawards(2,:),[12,1]);
+ repmat(cmaawards(3,:),[12,1]);
+ repmat(cmaawards(4,:),[12,1]);
+ repmat(cmaawards(5,:),[12,1]);
+ repmat(cmaawards(6,:),[12,1]);
+ repmat(cmaawards(7,:),[12,1]);
+ repmat(cmaawards(8,:),[12,1]);
+ repmat(cmaawards(9,:),[12,1]);
+ repmat(cmaawards(10,:),[12,1]);
+ repmat(cmaawards(11,:),[12,1]);
+ repmat(cmaawards(12,:),[12,1]);
+ repmat(cmaawards(13,:),[12,1]);
+ repmat(cmaawards(14,:),[12,1]);
+ repmat(cmaawards(15,:),[12,1]);
+];
+age_sex((leaveout-1)*12+1:(leaveout-1)*12+12,:) = [];
+age_sex(:,1) = logical(age_sex(:,1));
 
 wl = zeros(12,15);
 tl = zeros(12,15);
 x_ax = zeros(10,15);
 t = zeros(12,15);
-subj_data = zeros(12, 6);
+subj_data = zeros(12, 8);%This needs to be changed when you add extra model params
 for z=1:15
     if (z == leaveout)
         
@@ -71,13 +94,19 @@ for z=1:15
         data(z) = [];
         subj_data(:,1) = (1:12)';
         subj_data(:,2) = taskload(z,:)';
-        subj_data(:,6) = workload(2:end,z);
+        subj_data(:,6) = logical(cmaawards(z,1));
+        subj_data(:,7) = cmaawards(z,2);
+        %Add here- whenever you add extra model params
+        subj_data(:,8) = workload(2:end,z); %This needs to be changed when you add extra model params
         continue
     end
     wl(:,z) = workload(2:end,z);
     tl(:,z) = taskload(z,:)';
     x_ax(:,z) = (1:10)';
     t(:,z) = (1:12)';
+    
+    
+    
 end
 
 wl = wl(wl>0);
@@ -88,15 +117,15 @@ data = cell2mat(data);
 data(isinf(data)) = 0;
 
 
-tabl = table(t,tl,data(:,1),data(:,2),data(:,3),wl,...
-    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','wl'});
+tabl = table(t,tl,data(:,1),data(:,2),data(:,3), age_sex(:,1), age_sex(:,2),wl,...
+    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','Sex','Age','wl'});
 %HR*HFn+SDNN*pNN50+HR:pNN50+SDNN:HFn+pNN50:HFn+SDNN:pNN50:HFn+TrialOrder+Taskload
 % mdl = fitglm(tabl,...,
 %     'wl~1 + TrialOrder*Taskload + TrialOrder*HR + Taskload*HR + TrialOrder*SDNN + Taskload*SDNN + HR*SDNN + TrialOrder*pNN50 + Taskload*pNN50 + HR*pNN50 + SDNN*pNN50 + TrialOrder:Taskload:SDNN + TrialOrder:HR:SDNN + Taskload:HR:SDNN + TrialOrder:Taskload:pNN50 + TrialOrder:HR:pNN50 + TrialOrder:SDNN:pNN50 + Taskload:SDNN:pNN50 + HR:SDNN:pNN50 + TrialOrder:Taskload:SDNN:pNN50 + TrialOrder:HR:SDNN:pNN50',...,
 %     'ResponseVar','wl','Intercept',true);
 
 mdl = fitglm(tabl,...,
-    'wl ~ 1 + TrialOrder*HR + Taskload*HR + SDNN*pNN50',...,
+    'wl ~ 1 + Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50',...,
     'ResponseVar','wl','Intercept', true);
 
 
@@ -123,8 +152,8 @@ writetable(mdl.Coefficients, fn, 'WriteRowNames',true);
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 hold on;
-x = subj_data(:,6);
-y = mdl.predict(subj_data(:,1:5));
+x = subj_data(:,8); %This needs to be changed when you add extra model params
+y = mdl.predict(subj_data(:,1:7)); %This needs to be changed when you add extra model params
 scatter(x, y,80,'filled');
 xlabel('Subjective Workload')
 ylabel('Model Response')
