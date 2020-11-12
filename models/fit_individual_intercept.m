@@ -1,30 +1,37 @@
 clear workspace;
 clear all;
 
-mdl_coeffs = {
-'trial' -0.919087889
-'taskload' 5.669553729
-'hr' 6.347974589
-'sdnn' 20.52302969
-'pnn50' -1.658270901
-'rsp_amp' 2.952046888
-'rsp_rate' -1.722142018
-'sex' 9.115974125
-'age' 0.710144429
-'trial:hr' 0.928675764
-'taskload:hr' -4.799225654
-'sdnn:pnn50' 0.836340358
-'rsp_amp:rsp_rate' 1.180039501
-'rsp_amp:sex' -6.063245826
-'rsp_rate:sex' -1.505518089
-'sdnn:age' -0.851841749
-};
 
 
-subj_index = 2;
+subj_index = 5;
 %data = loadData(subj_index);
 [subj_data,mdl] = MakeModel(subj_index); %This model specifically does NOT have an intercept
-err = fitIntercept(subj_data,mdl);
+%[err, fitted_model] = fitIntercept(subj_data,mdl, -.5);
+
+x = fminsearch(@(suggested_intercept_val) fitIntercept(subj_data,mdl, suggested_intercept_val),4);
+
+figure;
+hold on;
+subj_predictors = subj_data{:, 1:end - 1};
+subj_response = subj_data{:,end};
+yfit = predict(mdl,subj_predictors) + x;
+scatter(subj_response, yfit,'r');
+p = polyfit(subj_response,yfit,1);
+pfit = polyval(p,subj_response);
+plot(subj_response,pfit,'-r','HandleVisibility','off');
+grid on;
+grid minor;
+
+hold on;
+subj_predictors = subj_data{:, 1:end - 1};
+subj_response = subj_data{:,end};
+yfit = predict(mdl,subj_predictors);
+scatter(subj_response, yfit,'b');
+p = polyfit(subj_response,yfit,1);
+pfit = polyval(p,subj_response);
+plot(subj_response,pfit,'-b','HandleVisibility','off');
+grid on;
+grid minor;
 
 function [subj_data,mdl] = MakeModel(subj_index)
 workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\Workload.csv');
@@ -213,12 +220,61 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
     subj_data = tabl(lower_bound:upper_bound,:);
     mdl = fitglm(tabl,...,
         'wl ~ Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex',...,
-        'ResponseVar','wl','Intercept', false);
+        'ResponseVar','wl','Intercept', true);
 end
 
-function sse = fitIntercept(subj_data, mdl)
+function total_sse = fitIntercept(subj_data, mdl, suggested_intercept_val)
+    mdl_coeffs = {
+    'trial' -0.919087889
+    'taskload' 5.669553729
+    'hr' 6.347974589
+    'sdnn' 20.52302969
+    'pnn50' -1.658270901
+    'rsp_amp' 2.952046888
+    'rsp_rate' -1.722142018
+    'sex' 9.115974125
+    'age' 0.710144429
+    'trial:hr' 0.928675764
+    'taskload:hr' -4.799225654
+    'sdnn:pnn50' 0.836340358
+    'rsp_amp:rsp_rate' 1.180039501
+    'rsp_amp:sex' -6.063245826
+    'rsp_rate:sex' -1.505518089
+    'sdnn:age' -0.851841749
+    };
+
     subj_predictors = subj_data{:, 1:end - 1};
     subj_response = subj_data{:,end};
-    y_fit = mdl.predict(subj_predictors);
-    sse = sum((y_fit - subj_response).^2);
+%     y_fit = predict(mdl,subj_predictors) + suggested_intercept_val;
+%     sse = sum((y_fit - subj_response).^2);
+    total_sse = 0;
+    for r=1:12
+        tr = mdl_coeffs{1,2}*subj_predictors(r,1);
+        tl = mdl_coeffs{2,2}*subj_predictors(r,2);
+        hr = mdl_coeffs{3,2}*subj_predictors(r,3);
+        sdnn = mdl_coeffs{4,2}*subj_predictors(r,4);
+        pnn50 = mdl_coeffs{5,2}*subj_predictors(r,5);
+        amp = mdl_coeffs{6,2}*subj_predictors(r,6);
+        rate = mdl_coeffs{7,2}*subj_predictors(r,7);
+        sex  = mdl_coeffs{8,2}*subj_predictors(r,8);
+        age = mdl_coeffs{9,2}*subj_predictors(r,9);
+        trial_hr = mdl_coeffs{10,2}*subj_predictors(r,1)*subj_predictors(r,3);
+        tl_hr = mdl_coeffs{11,2}*subj_predictors(r,2)*subj_predictors(r,3);
+        sdnn_pnn50 = mdl_coeffs{12,2}*subj_predictors(r,4)*subj_predictors(r,5);
+        amp_rate = mdl_coeffs{13,2}*subj_predictors(r,6)*subj_predictors(r,7);
+        amp_sex = mdl_coeffs{14,2}*subj_predictors(r,6)*subj_predictors(r,8);
+        rate_sex = mdl_coeffs{15,2}*subj_predictors(r,7)*subj_predictors(r,8);
+        sdnn_age = mdl_coeffs{16,2}*subj_predictors(r,4)*subj_predictors(r,9);
+        
+        prediction = tr+tl+hr+sdnn+pnn50+amp+rate+sex+age+trial_hr+tl_hr+sdnn_pnn50+amp_rate+amp_sex+rate_sex+sdnn_age - 24.35 ;
+        prediction = prediction + suggested_intercept_val;
+    
+        sse =  (prediction - subj_response(r)).^2;
+        total_sse = total_sse + sse;
+    end
+    
+ 
+    
+    
+    
 end
