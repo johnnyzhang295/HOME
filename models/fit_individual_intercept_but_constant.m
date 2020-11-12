@@ -50,7 +50,7 @@ for subj_index=1:12
                 sdnn_age = mdl_coeffs{16,2}*subj_predictors(r,4)*subj_predictors(r,9);
 
                 prediction = tr+tl+hr+sdnn+pnn50+amp+rate+sex+age+trial_hr+tl_hr+sdnn_pnn50+amp_rate+amp_sex+rate_sex+sdnn_age - 24.35 ;
-                prediction = prediction + x;
+                
                 scatter(subj_response(r), prediction, 'r');
                 predictions(r) = prediction;
         end
@@ -75,7 +75,7 @@ for subj_index=1:12
         
     
 end
-suptitle("Fminsearch Individualized Intercepts Fit");
+suptitle("Constant Coeff Individual Fit");
 function [subj_data,mdl] = MakeModel(subj_index)
         workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\Workload.csv');
         taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
