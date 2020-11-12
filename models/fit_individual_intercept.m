@@ -1,5 +1,32 @@
 clear workspace;
 clear all;
+
+mdl_coeffs = {
+'trial' -0.919087889
+'taskload' 5.669553729
+'hr' 6.347974589
+'sdnn' 20.52302969
+'pnn50' -1.658270901
+'rsp_amp' 2.952046888
+'rsp_rate' -1.722142018
+'sex' 9.115974125
+'age' 0.710144429
+'trial:hr' 0.928675764
+'taskload:hr' -4.799225654
+'sdnn:pnn50' 0.836340358
+'rsp_amp:rsp_rate' 1.180039501
+'rsp_amp:sex' -6.063245826
+'rsp_rate:sex' -1.505518089
+'sdnn:age' -0.851841749
+};
+
+
+subj_index = 2;
+%data = loadData(subj_index);
+[subj_data,mdl] = MakeModel(subj_index); %This model specifically does NOT have an intercept
+err = fitIntercept(subj_data,mdl);
+
+function [subj_data,mdl] = MakeModel(subj_index)
 workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\Workload.csv');
 taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
 hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
@@ -125,7 +152,6 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
     data(14,:) = {[hrv214(:,donk)./b214(donk) r_214]};
     data(15,:) = {[hrv215(:,donk)./b215(donk) r_215]};
 
-    leaveout =0;
 
     age_sex = zeros(180,2);
     age_sex = ...
@@ -145,10 +171,7 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
      repmat(cmaawards(14,:),[12,1]);
      repmat(cmaawards(15,:),[12,1]);
     ];
-    if (leaveout > 0)
-        age_sex((leaveout-1)*12+1:(leaveout-1)*12+12,:) = [];
-        age_sex(:,1) = logical(age_sex(:,1));
-    end
+    leaveout = 0;
     wl = zeros(12,15);
     tl = zeros(12,15);
     x_ax = zeros(10,15);
@@ -172,9 +195,6 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
         tl(:,z) = taskload(z,:)';
         x_ax(:,z) = (1:10)';
         t(:,z) = (1:12)';
-
-
-
     end
 
     wl = wl(wl>0);
@@ -183,71 +203,22 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
     t = t(t>0);
     data = cell2mat(data);
     data(isinf(data)) = 0;
-
+    
 
     tabl = table(t,tl,data(:,1),data(:,2),data(:,3),data(:,4),data(:,5), age_sex(:,1), age_sex(:,2),wl,...
         'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','RSP_Amp','RSP_Rate','Sex','Age','wl'});
 
+    lower_bound = (subj_index - 1)*12 + 1;
+    upper_bound = (subj_index - 1)*12 + 12;
+    subj_data = tabl(lower_bound:upper_bound,:);
     mdl = fitglm(tabl,...,
-        'wl ~ 1 + Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex',...,
-        'ResponseVar','wl','Intercept', true);
-    % mdl = stepwiseglm(tabl,...,
-    %     'wl ~ 1 + Sex*Age * TrialOrder*HR * Taskload* SDNN*pNN50',...,
-    %     'ResponseVar','wl','Intercept', true,'Criterion','Deviance');
-    % mdl = stepwiseglm(tabl);
-    % mdl = stepwiseglm(tabl,...,
-    %     'wl ~ 1 + Sex+Age + TrialOrder+HR +Taskload+ SDNN+pNN50+RSP_Amp+RSP_Rate',...,
-    %     'ResponseVar','wl','Intercept', true,'Criterion','Deviance');
-    % mdl = stepwiseglm(tabl,...,
-    %     'wl ~ 1 + Age*Sex*HR*SDNN*pNN50*TrialOrder*Taskload*RSP_Amp*RSP_Rate',...,
-    %     'ResponseVar','wl','Intercept', true);
+        'wl ~ Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex',...,
+        'ResponseVar','wl','Intercept', false);
+end
 
-
-    figure('units','normalized','outerposition',[0 0 1 1]);
-    scatter(wl,mdl.Fitted.Response);
-    ylim([1 10]);
-    hold on;
-
-    xlabel('Subjective Workload')
-    ylabel('Model Response')
-
-    p = polyfit(wl,mdl.Fitted.Response,1);
-    yfit = polyval(p,wl);
-    plot(wl,yfit,'-r','HandleVisibility','off');
-    grid on;
-    grid minor;
-    title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
-    title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
-    saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_1,'.jpg'));
-
-    fn = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model coefficeints\LOOCV coefficients\',title_1,'modelCoefficients.txt');
-    writetable(mdl.Coefficients, fn, 'WriteRowNames',true);
-
-    figure('units','normalized','outerposition',[0 0 1 1]);
-    hold on;
-    x = subj_data(:,10); %This needs to be changed when you add extra model params
-    y = mdl.predict(subj_data(:,1:9)); %This needs to be changed when you add extra model params
-    scatter(x, y,80,'filled');
-    xlabel('Subjective Workload')
-    ylabel('Model Response')
-    p = polyfit(x,y,1);
-    grid on;
-    grid minor;
-    yfit = polyval(p, x);
-    plot(x, yfit,'-r','HandleVisibility','off');
-
-    diff = x-y;
-    mean_err = mean(diff);
-    std_err = std(diff);
-    title_2 = strcat('Model Prediction for Subj ',{' '},string(pnums(leaveout,:)));
-
-    se = sse(diff);
-    title(strcat(title_2,' Mean Err: ',string(mean_err), ' StdDev Err: ',string(std_err),' SSE: ',string(se)));
-    saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_2,'.jpg'));
-
-
-    mdl
-    display(mean_err);
-    display(std_err);
-    display(se);
-    
+function sse = fitIntercept(subj_data, mdl)
+    subj_predictors = subj_data{:, 1:end - 1};
+    subj_response = subj_data{:,end};
+    y_fit = mdl.predict(subj_predictors);
+    sse = sum((y_fit - subj_response).^2);
+end
