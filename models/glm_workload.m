@@ -15,13 +15,15 @@ pnums = ['201';'202';'203';'204';'205';'206';'207';'208';'209';'210';'211';'212'
 j = 1;
 sum_aic =0;
 sum_bic = 0;
+formula = '';
 for i=1:12:180
 
     MakeGraphPretty(j);
+    formula = 'Workload~1 + TrialOrder * Taskload * BreathAmplitude + HR + SDNN + pNN50';
     dataTable = table(trial_order, tl(i:i+11), y(i:i+11, 1),...
         y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4), y(i:i+11,5), age_sex(i:i+11,1), age_sex(i:i+11,2),wl(i:i+11), 'VariableNames',...
-        {'TrialOrder','Taskload','HR','SDNN','pNN50','RSP_Amplitude','RSP_Rate','Age','Sex','Workload'});
-    mdl = fitglm(dataTable,'Workload~TrialOrder + Taskload +HR + SDNN + pNN50 + RSP_Amplitude+RSP_Rate+Age+Sex',...
+        {'TrialOrder','Taskload','HR','SDNN','pNN50','BreathAmplitude','BreathRate','Age','Sex','Workload'});
+    mdl = fitglm(dataTable,formula,...
        'ResponseVar','Workload','Intercept',true);
 
     scatter(wl(i:i+11),mdl.Fitted.Response);
@@ -38,8 +40,10 @@ for i=1:12:180
     end
 
     r_sq = char(string(mdl.Rsquared.Adjusted));
-    r_sq = r_sq(1:5);
-    title(strcat('Part',{' '},pnums(j,:),' Adj R-Squared: ',r_sq));
+    r_sq = r_sq(1:end-3);
+    r_sq_normal = char(string(mdl.Rsquared.Ordinary));
+    r_sq_normal = r_sq_normal(1:end-3);
+    title(strcat('Part',{' '},pnums(j,:),' Adj R-Sq: ',r_sq, ', R-Sq: ',r_sq_normal));
 
 
 
@@ -47,7 +51,7 @@ for i=1:12:180
 end
 
 titl='';
-%MakeBigGraphPretty();
+MakeBigGraphPretty(formula,sum_aic,sum_bic);
 if (save==1)
     saveGraph()
 end
@@ -62,14 +66,14 @@ function MakeGraphPretty(j)
     ylabel('Model Response');
     axis equal;
 end
-function MakeBigGraphPretty()
-    titl = 'WL ~ B0 + TrialOrd * TL + HR * SDNN * pNN50    Model';
+function MakeBigGraphPretty(formula,sum_aic,sum_bic)
+
     aic_label = char(string(sum_aic));
     aic_label = aic_label(1:end-2);
     bic_label = char(string(sum_bic));
     bic_label = bic_label(1:end-2);
-    aicbic_vals = strcat('     AIC:',aic_label,'     BIC:',bic_label);
-    titl2 = strcat(titl,aicbic_vals);
+    aicbic_vals = strcat('     SUM AIC:',aic_label,'     SUM BIC:',bic_label);
+    titl2 = strcat(formula,aicbic_vals);
     suptitle(titl2);
 
 end
