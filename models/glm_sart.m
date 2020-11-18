@@ -6,7 +6,7 @@ clear all;
 figure('units','normalized','outerposition',[0 0 1 1]);
 
 data_index = [1 4 12];
-[trial_order, tl,y,wl,age_sex] = loadData(data_index);
+[trial_order, tl,y,sart,age_sex] = loadData(data_index);
 
 
 save=0;
@@ -19,17 +19,17 @@ formula = '';
 for i=1:12:180
 
     MakeGraphPretty(j);
-    formula = 'Workload~1 + TrialOrder * Taskload * BreathAmplitude + HR + SDNN + pNN50';
+    formula = 'SART~1 + TrialOrder * Taskload * BreathAmplitude + HR + SDNN + pNN50';
     dataTable = table(trial_order, tl(i:i+11), y(i:i+11, 1),...
-        y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4), y(i:i+11,5), age_sex(i:i+11,1), age_sex(i:i+11,2),wl(i:i+11), 'VariableNames',...
-        {'TrialOrder','Taskload','HR','SDNN','pNN50','BreathAmplitude','BreathRate','Age','Sex','Workload'});
+        y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4), y(i:i+11,5), age_sex(i:i+11,1), age_sex(i:i+11,2),sart(i:i+11), 'VariableNames',...
+        {'TrialOrder','Taskload','HR','SDNN','pNN50','BreathAmplitude','BreathRate','Age','Sex','SART'});
     mdl = fitglm(dataTable,formula,...
-       'ResponseVar','Workload','Intercept',true);
+       'ResponseVar','SART','Intercept',true);
 
-    scatter(wl(i:i+11),mdl.Fitted.Response);
-    p = polyfit(wl(i:i+11),mdl.Fitted.Response,1);
-    yfit = polyval(p,wl(i:i+11));
-    plot(wl(i:i+11),yfit,'-r','HandleVisibility','off');
+    scatter(sart(i:i+11),mdl.Fitted.Response);
+    p = polyfit(sart(i:i+11),mdl.Fitted.Response,1);
+    yfit = polyval(p,sart(i:i+11));
+    plot(sart(i:i+11),yfit,'-r','HandleVisibility','off');
 
     [aic,bic] = aicbic(mdl.LogLikelihood,mdl.NumEstimatedCoefficients,mdl.NumObservations);
     sum_aic = sum_aic + aic;
@@ -62,7 +62,7 @@ function MakeGraphPretty(j)
     grid minor;
     hold on;
 
-    xlabel('Subject Workload');
+    xlabel('SART Score');
     ylabel('Model Response');
     axis equal;
 end
@@ -77,7 +77,7 @@ function MakeBigGraphPretty(formula,sum_aic,sum_bic)
     suptitle(titl2);
 
 end
-function [trial_order,tl,y,wl,age_sex] = loadData(data_index)
+function [trial_order,tl,y,sart,age_sex] = loadData(data_index)
     sart = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\SARTScores.txt');
     workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
     taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
@@ -165,24 +165,6 @@ function [trial_order,tl,y,wl,age_sex] = loadData(data_index)
      repmat(cmaawards(14,:),[12,1]);
      repmat(cmaawards(15,:),[12,1]);
     ];
-
-    wl = [
-         workload(2:end,1);
-         workload(2:end,2);
-         workload(2:end,3);
-         workload(2:end,4);
-         workload(2:end,5);
-         workload(2:end,6);
-         workload(2:end,7);
-         workload(2:end,8);
-         workload(2:end,9);
-         workload(2:end,10);
-         workload(2:end,11);
-         workload(2:end,12);
-         workload(2:end,13);
-         workload(2:end,14);
-         workload(2:end,15);
-        ];
 
     tl = [
          taskload(1,:)';
