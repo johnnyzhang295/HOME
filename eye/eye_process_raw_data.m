@@ -1,27 +1,29 @@
-clear all;
 clear workspace;
+clear all;
 
+data = readmatrix('sectionData.csv');
+sync = readmatrix('Part201_BiopacLSLTimes.csv');
 taskload = load('taskload.txt');
 
-subject_id = [201; 202; 203; 204; 205; 206; 207; 208; 209; 210; 211; 212; 213; 214; 215;];
-
-
-d = readmatrix('sectionData.csv');
-sync = readmatrix('Part201_BiopacLSLTimes.csv');
-
-
 sync = sync(:,2);
+timestamps = data(:,1);
+diameters = data(:,3);
+group = data(:,2);
+confs = data(:,4);
 
-timestamps = d(:,1);
-diameters = d(:,3);
-group = d(:,2);
-confidences = d(:,4);
+filtered_diameter = [];
 
-data = {[timestamps diameters group confidences] sync};
+j=1;
+for d=diameters'
+    if (d > 1 && d < 10 && data(j,4) > 0.8)
+        filtered_diameter(j) = d;
+    else
+        filtered_diameter(j) = NaN;
+    end
+    j= j+1;
+end
 
-data{1,1} = ...
-    data{1,1}(diameters > 1 & diameters < 10 & confidences > .8,:);
-
+filtered_diameter = filtered_diameter'; %Transpose this to make it a N x 1 column vector
 
 %% Piloting Intervals
 t1 = sync(2:3,:);
@@ -37,19 +39,23 @@ t10 = sync(38:39,:);
 t11 = sync(42:43,:);
 t12 = sync(46:47,:);
 
+
+data_to_be_filtered = [timestamps filtered_diameter group confs]; %I put all the pupillabs data into one data structure
+% so that it can be easily modified, shown below.
+
 data_by_trial = {
-    data{1,1}(timestamps > t1(1) & timestamps < t1(2),:); %This is indexing the data by providing a lower bound and upper bound
-    data{1,1}(timestamps > t2(1) & timestamps < t2(2),:); %Each row is each trial so we have to change the t# variable
-    data{1,1}(timestamps > t3(1) & timestamps < t3(2),:);
-    data{1,1}(timestamps > t4(1) & timestamps < t4(2),:);
-    data{1,1}(timestamps > t5(1) & timestamps < t5(2),:);
-    data{1,1}(timestamps > t6(1) & timestamps < t6(2),:);
-    data{1,1}(timestamps > t7(1) & timestamps < t7(2),:);
-    data{1,1}(timestamps > t8(1) & timestamps < t8(2),:);
-    data{1,1}(timestamps > t9(1) & timestamps < t9(2),:);
-    data{1,1}(timestamps > t10(1) & timestamps < t10(2),:);
-    data{1,1}(timestamps > t11(1) & timestamps < t11(2),:);
-    data{1,1}(timestamps > t12(1) & timestamps < t12(2),:);
+    data_to_be_filtered(timestamps > t1(1) & timestamps < t1(2),:); %This is indexing the data by providing a lower bound and upper bound
+    data_to_be_filtered(timestamps > t2(1) & timestamps < t2(2),:); %Each row is each trial so we have to change the t# variable
+    data_to_be_filtered(timestamps > t3(1) & timestamps < t3(2),:);
+    data_to_be_filtered(timestamps > t4(1) & timestamps < t4(2),:);
+    data_to_be_filtered(timestamps > t5(1) & timestamps < t5(2),:);
+    data_to_be_filtered(timestamps > t6(1) & timestamps < t6(2),:);
+    data_to_be_filtered(timestamps > t7(1) & timestamps < t7(2),:);
+    data_to_be_filtered(timestamps > t8(1) & timestamps < t8(2),:);
+    data_to_be_filtered(timestamps > t9(1) & timestamps < t9(2),:);
+    data_to_be_filtered(timestamps > t10(1) & timestamps < t10(2),:);
+    data_to_be_filtered(timestamps > t11(1) & timestamps < t11(2),:);
+    data_to_be_filtered(timestamps > t12(1) & timestamps < t12(2),:);
 };
 
 filtered_data_by_trial = {};
@@ -82,7 +88,7 @@ for i=1:12
    
    x_axis = linspace(0,50,length);
    
-   gscatter(filtered_xyz(:,1),filtered_xyz(:,2), filtered_xyz(:,3));
+   gscatter(x_axis,filtered_xyz(:,2), filtered_xyz(:,3));
    title(strcat('Trial # ',string(i)));
    legend({'Left Eye','Right Eye'},'Location','best');
    
@@ -105,3 +111,4 @@ low_tl_data = filtered_data_by_trial{low_tl_indexes}; %Get the data by the index
 med_tl_data = filtered_data_by_trial{med_tl_indexes};
 hi_tl_data = filtered_data_by_trial{hi_tl_indexes};
 
+save 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\filtered_pilotinterval_pupil_positions.mat' filtered_data_by_trial
