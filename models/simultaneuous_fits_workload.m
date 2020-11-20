@@ -215,10 +215,11 @@ tabl = table(t,tl,data(:,1),data(:,2),data(:,3),data(:,4),data(:,5), age_sex(:,1
 %%  Do something useful
 starting_formula = 'wl ~ TrialOrder * Taskload+HR*SDNN*pNN50*RSP_Amp*RSP_Rate*Sex*Age';
 %mdl = stepwiseglm(tabl,starting_formula,'Criterion','Deviance');
-frma = 'wl ~ 1 + Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex+ID';
-        
+frma_18 = 'wl ~ 1 + Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex+ID';
+f =    'wl ~ 1 + TrialOrder*HR + Taskload*HR + Taskload*RSP_Amp + HR*SDNN + HR*pNN50 + HR*RSP_Amp + HR*RSP_Rate + HR*Sex + HR*Age + SDNN*pNN50 + SDNN*RSP_Amp + SDNN*RSP_Rate + SDNN*Sex + SDNN*Age + pNN50*RSP_Amp + pNN50*RSP_Rate + pNN50*Sex + pNN50*Age + RSP_Amp*RSP_Rate + RSP_Amp*Sex + RSP_Amp*Age  + RSP_Rate*Sex + RSP_Rate*Age + Sex*Age + HR:SDNN:pNN50 + HR:SDNN:RSP_Amp + HR:SDNN:RSP_Rate + HR:SDNN:Sex + HR:SDNN:Age + HR:pNN50:RSP_Amp + HR:pNN50:RSP_Rate + HR:pNN50:Sex + HR:pNN50:Age + HR:RSP_Amp:RSP_Rate + HR:RSP_Amp:Sex + HR:RSP_Amp:Age + HR:RSP_Rate:Sex + HR:RSP_Rate:Age + HR:Sex:Age + SDNN:pNN50:RSP_Amp + SDNN:pNN50:RSP_Rate + SDNN:pNN50:Sex + SDNN:pNN50:Age + SDNN:RSP_Amp:RSP_Rate + SDNN:RSP_Amp:Age + SDNN:RSP_Rate:Sex + SDNN:Sex:Age + pNN50:RSP_Amp:RSP_Rate + pNN50:RSP_Amp:Sex + pNN50:RSP_Amp:Age + pNN50:RSP_Rate:Sex + pNN50:RSP_Rate:Age + pNN50:Sex:Age + RSP_Amp:RSP_Rate:Sex + RSP_Amp:RSP_Rate:Age + RSP_Rate:Sex:Age + HR:SDNN:pNN50:RSP_Amp + HR:SDNN:pNN50:RSP_Rate + HR:SDNN:pNN50:Sex + HR:SDNN:pNN50:Age + HR:SDNN:RSP_Amp:RSP_Rate + HR:SDNN:RSP_Amp:Age + HR:SDNN:RSP_Rate:Sex + HR:SDNN:Sex:Age + HR:pNN50:RSP_Amp:RSP_Rate + HR:pNN50:RSP_Amp:Age + HR:pNN50:RSP_Rate:Sex + HR:pNN50:RSP_Rate:Age + HR:RSP_Amp:RSP_Rate:Sex + HR:RSP_Amp:RSP_Rate:Age + HR:RSP_Rate:Sex:Age + SDNN:pNN50:RSP_Amp:Age + SDNN:pNN50:RSP_Rate:Sex + pNN50:RSP_Amp:RSP_Rate:Sex + pNN50:RSP_Amp:RSP_Rate:Age + pNN50:RSP_Rate:Sex:Age + HR:SDNN:pNN50:RSP_Amp:Age + HR:SDNN:pNN50:RSP_Rate:Sex + HR:pNN50:RSP_Amp:RSP_Rate:Age + ID';     
+f_69 = 'wl ~ 1+ TrialOrder*HR + Taskload*HR + HR*SDNN*pNN50*RSP_Amp*RSP_Rate*Age + ID';
 %stepwise_formula = 'wl~ ID + TrialOrder* Taskload*HR + SDNN* pNN50 + RSP_Rate + Sex + Age + SDNN:RSP_Rate + pNN50:Sex + RSP_Rate:Sex + RSP_Rate:Age';
-mdl = fitglm(tabl,frma);
+mdl = fitglm(tabl,frma_18);
 figure('units','normalized','outerposition',[0 0 1 1]);
     
 %scatter(tabl{:,end},mdl.Fitted.Response);
@@ -245,4 +246,4 @@ topTitle = sprintf('Workload Psychophysiological Regression Model Performance \n
 
 suptitle(topTitle);
 fn = 'Workload Psychophysiological Regression Model Performance';
-saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));
+%saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));
