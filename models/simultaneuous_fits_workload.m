@@ -209,15 +209,16 @@ partnos = ...
 ];
 partnos = categorical(partnos);
 
-tabl = table(t,tl,data(:,1),data(:,2),data(:,3),data(:,4),data(:,5), age_sex(:,1), age_sex(:,2),partnos,sart,...
-    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','RSP_Amp','RSP_Rate','Sex','Age','ID','SART'});
+tabl = table(t,tl,data(:,1),data(:,2),data(:,3),data(:,4),data(:,5), age_sex(:,1), age_sex(:,2),partnos,wl,...
+    'VariableNames',{'TrialOrder','Taskload','HR','SDNN','pNN50','RSP_Amp','RSP_Rate','Sex','Age','ID','wl'});
 
 %%  Do something useful
-starting_formula = 'SART ~ TrialOrder + Taskload+HR+SDNN+pNN50+RSP_Amp+RSP_Rate+Sex+Age';
-%mdl = stepwiseglm(tabl,starting_formula,'Criterion','aic');
-
-stepwise_formula = 'SART~ HR:SDNN + TrialOrder*HR + Taskload +SDNN + RSP_Amp + ID';
-mdl = fitglm(tabl,stepwise_formula);
+starting_formula = 'wl ~ TrialOrder * Taskload+HR*SDNN*pNN50*RSP_Amp*RSP_Rate*Sex*Age';
+%mdl = stepwiseglm(tabl,starting_formula,'Criterion','Deviance');
+frma = 'wl ~ 1 + Sex+Age + TrialOrder*HR + Taskload*HR + SDNN*pNN50 +SDNN*Age + RSP_Amp*RSP_Rate +RSP_Amp:Sex + RSP_Rate:Sex+ID';
+        
+%stepwise_formula = 'wl~ ID + TrialOrder* Taskload*HR + SDNN* pNN50 + RSP_Rate + Sex + Age + SDNN:RSP_Rate + pNN50:Sex + RSP_Rate:Sex + RSP_Rate:Age';
+mdl = fitglm(tabl,frma);
 figure('units','normalized','outerposition',[0 0 1 1]);
     
 %scatter(tabl{:,end},mdl.Fitted.Response);
@@ -226,23 +227,22 @@ j=1;
 for i=1:12:180
     subplot(3,5,j); 
     hold on;
-    plot(sart(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
-    p = polyfit(sart(i:i+11),mdl.Fitted.Response(i:i+11),1);
-    yfit = polyval(p,sart(i:i+11));
+    plot(wl(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+    p = polyfit(wl(i:i+11),mdl.Fitted.Response(i:i+11),1);
+    yfit = polyval(p,wl(i:i+11));
     %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
-    plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
-    ylim([0,46])
-    xlim([0,46])
-    
+    plot([1,10],[1,10],'-', 'Color', ColOrd(j,:));
+    ylim([1,10])
+    xlim([1,10])
     ylabel('Model Response');
-    xlabel('SART Score');
+    xlabel('Reported Workload');
     title(string(partnos(i)));
     j = j+1;
     grid on;
     
 end
-topTitle = sprintf('SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
+topTitle = sprintf('Workload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
 
 suptitle(topTitle);
-fn = 'SA Psychophysiological Regression Model Performance';
+fn = 'Workload Psychophysiological Regression Model Performance';
 saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));
