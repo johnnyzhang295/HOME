@@ -5,6 +5,17 @@ data = readmatrix('sectionData.csv');
 sync = readmatrix('Part201_BiopacLSLTimes.csv');
 taskload = load('taskload.txt');
 
+x = {data sync taskload};
+
+f = ProcessData(x);
+
+function filtered_data_by_trial = ProcessData(x)
+
+data = x{:,1};
+sync = x{:,2};
+taskload = x{:,3};
+
+
 sync = sync(:,2);
 timestamps = data(:,1);
 diameters = data(:,3);
@@ -112,3 +123,5 @@ med_tl_data = filtered_data_by_trial{med_tl_indexes};
 hi_tl_data = filtered_data_by_trial{hi_tl_indexes};
 
 save 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\filtered_pilotinterval_pupil_positions.mat' filtered_data_by_trial
+
+end
