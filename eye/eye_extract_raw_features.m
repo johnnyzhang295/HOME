@@ -2,29 +2,43 @@
 
 ids= 201:215;
 
-ids = 203;
+ids = 201:203';
 
 ExtractRawFeatures(ids);
 
 function ExtractRawFeatures(x)
 
-filepath = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',string(x),'\');
-in_filename = 'pupil_positions.csv';
+len = length(x);
 
-raw_data = readmatrix(strcat(filepath, in_filename));
+for i=1:len
+    try
+        y = x(i);
+        display(strcat('NOW PROCESSING ...',string(y)));
+        
+        filepath = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',string(y),'\');
+        in_filename = 'pupil_positions.csv';
 
-timestamps = raw_data(:,1);
-diameters = raw_data(:,14);
-group = raw_data(:,3);
-confs = raw_data(:,4);
+        raw_data = readmatrix(strcat(filepath, in_filename));
 
-raw_features = table(timestamps, diameters, group, confs, ...
-    'VariableNames', {'Timestamps','Diameters','ID','Confidence'});
+        timestamps = raw_data(:,1);
+        diameters = raw_data(:,14);
+        group = raw_data(:,3);
+        confs = raw_data(:,4);
 
-out_filename = 'eye_raw_features.mat';
-out_filepath = strcat(filepath,out_filename);
+        raw_features = table(timestamps, diameters, group, confs, ...
+            'VariableNames', {'Timestamps','Diameters','ID','Confidence'});
 
-save(out_filepath,'raw_features');
+        out_filename = 'eye_raw_features.mat';
+        out_filepath = strcat(filepath,out_filename);
+
+        save(out_filepath,'raw_features');
+        
+    catch ERR
+        display(ERR.message);
+        
+    end
+
+end
 
 end
 
