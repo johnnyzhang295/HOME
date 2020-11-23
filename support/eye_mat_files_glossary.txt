@@ -1,0 +1,21 @@
+eye_raw_features.mat                              
+- This file is contains a subset of pupil_positions.csv,
+- This file contains timestamps, diameters, eye_ids, and confidence values,
+- pupil_positions.csv is generated as an export file from pupil labs, 
+- and has a lot of extraneuos features we don't care about. 
+- IMPORTANT: This is all the unfiltered data from the entire experiment period
+
+filtered_pilot_interval_pupil_positions.mat
+- This file contains two datasets
+- The first column is eye_raw_features but separated by trial and now filtered
+- The second column is a partial (see summary table) table of the eye features
+- Second col has taskload, workload, median and mean pupil diameters, blink count
+- The second column is sort of redundant. Each row is identical to the others.
+- IMPORTANT: This is filtered data from a single subject
+- IMPORTANT: This is only the piloting interval portion
+
+eye_features_summary_table.mat
+- This file contains a summary table divided by trial
+- Included are taskload, workload, median and mean pupil diameters, blink count, MPDC, and trial order
+- IMPORTANT: MPDC = mean_trial_X / mean_across_all_trials
+- IMPORTANT: This is a really dank ass summary table which should be used often
