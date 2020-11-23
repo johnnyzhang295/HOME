@@ -1,8 +1,4 @@
-
-
 ids= 201:215;
-
-ids = 201:203';
 
 ExtractRawFeatures(ids);
 
