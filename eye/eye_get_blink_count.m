@@ -1,7 +1,7 @@
 clear workspace;
 clear all;
 
-for idnum=2:2 %Change to 1:15
+for idnum=1:15 %Change to 1:15
 try
     if (idnum>9)
         id = strcat('2',string(idnum));
@@ -14,6 +14,7 @@ fn = 'eye_raw_features.mat';
 load(strcat(filepath,fn)); 
 
 blinks = raw_features(raw_features.Diameters < .1,:);
+%blinks_right_eye = blinks(blinks.Confidence > .6,:);
 blinks_right_eye = blinks(blinks.ID == 0,:);
 
 sync_data = readmatrix(strcat(filepath,'Part',id,'_BiopacLSLTimes.csv'));
@@ -49,5 +50,6 @@ blinks_by_trial = {
 
 catch ERR
     display(ERR.message);
+    display(strcat("Occurs on Line: ",ERR.stack.line));
 end
 end
