@@ -13,11 +13,11 @@ filepath = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part';
 
 data_types = {'double','double','double','double',...
     'double','double','double','double',...
-    'categorical','double','categorical','double'};
+    'categorical','double','double','categorical','double','double'};
 data_names = {'Taskload','TrialOrder','HR','SDNN','pNN50',...
     'RspAmp','RspRate','Age','Sex',...
-    'PupilDiameter','ID','Workload'};
-data = table('Size',[24 length(data_types)],'VariableTypes',data_types,'VariableNames',data_names);
+    'PupilDiameter','BlinkCount','ID','SART','Workload'};
+data = table('Size',[24 14],'VariableTypes',data_types,'VariableNames',data_names);
 
 ecg_feature_indexes = [1 4 12];
 ind = 1;
@@ -44,10 +44,12 @@ for id=201:215
    data.RspAmp(ind:ind+11) = normalized_rsp_features(:,1);
    data.RspRate(ind:ind+11) = normalized_rsp_features(:,2);
    data.PupilDiameter(ind:ind+11) = raw_eye_features.summary_table.Median;
+   data.BlinkCount(ind:ind+11) = raw_eye_features.summary_table.("Blink Count");
    data.Workload(ind:ind+11) = workload(2:end,counter);
    data.Taskload(ind:ind+11) = taskload(counter,:)';
    data.TrialOrder(ind:ind+11) = trial_order;
    data.ID(ind:ind+11) = categorical(repmat(id,[12 1]));
+   data.SART(ind:ind+11) = sart(ind:ind+11);
    data.Age(ind:ind+11) = repmat(sex_age(counter,2), [12 1]);
    data.Sex(ind:ind+11) = categorical(repmat(sex_age(counter,1), [12 1]));
    
@@ -56,17 +58,10 @@ for id=201:215
    counter = counter + 1; %yes very hacky indeed
 end
 
-data(isinf(data{:,5}),5) = {0};
+
 
 %%  Do something useful
-stepwise_formula_x = ...
-    'Workload ~ 1 + TrialOrder + Taskload + HR+RspAmp+ RspRate+PupilDiameter +pNN50+SDNN ';
-%mdl = stepwiseglm(data,stepwise_formula_x,'Criterion','aic');
-%['1 + Taskload*ID + TrialOrder*ID + SDNN*RspRate']
-%['1 + Taskload*RspAmp + Taskload*ID + TrialOrder*ID + HR*RspAmp + SDNN*RspRate + pNN50*PupilDiameter']
-%from_stepwise = 'Workload~1+TrialOrder*Taskload * HR*SDNN*pNN50+ HR*PupilDiameter* RspAmp*RspRate +ID ';
-%very_manual = 'Workload~1+TrialOrder+Taskload+HR+SDNN+pNN50+PupilDiameter+RspAmp+RspRate+ID+Taskload:TrialOrder+TrialOrder:HR+TrialOrder:SDNN+TrialOrder:pNN50+HR:pNN50+SDNN:pNN50+HR:RspAmp+HR:RspRate+HR:PupilDiameter+RspRate:PupilDiameter+RspAmp:PupilDiameter+Taskload:TrialOrder:HR:pNN50+TrialOrder:HR:SDNN';
-formula = 'Workload ~ 1 + TrialOrder+SDNN*RspRate+RspAmp+RspRate*Age+ID+Taskload*HR + PupilDiameter + HR:PupilDiameter';
+formula = 'SART ~ 1 + TrialOrder+SDNN*RspRate+RspAmp+RspRate*Age+ID+Taskload*HR + PupilDiameter + HR:PupilDiameter';
 mdl = fitglm(data,formula);
 figure('units','normalized','outerposition',[0 0 1 1]);
     
@@ -74,21 +69,22 @@ j=1;
 for i=1:12:180
     subplot(3,5,j); 
     hold on;
-    plot(workload(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
-    p = polyfit(workload(i:i+11),mdl.Fitted.Response(i:i+11),1);
-    yfit = polyval(p,workload(i:i+11));
+    plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+    p = polyfit(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),1);
+    yfit = polyval(p,data.SART(i:i+11));
     %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
-    plot([1,10],[1,10],'-', 'Color', ColOrd(j,:));
-    ylim([1,10])
-    xlim([1,10])
+    plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+    ylim([0,46])
+    xlim([0,46])
+    title(strcat('20',string(j)));
     ylabel('Model Response');
-    xlabel('Reported Workload');
+    xlabel('SART Score');
     j = j+1;
     grid on;
     
 end
-topTitle = sprintf('Workload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
+topTitle = sprintf('SART Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
 
 suptitle(topTitle);
-fn = 'Workload Psychophysiological Regression Model Performance';
+fn = 'SART Psychophysiological Regression Model Performance Best Fit';
 %saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));

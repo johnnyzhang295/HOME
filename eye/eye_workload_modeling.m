@@ -61,10 +61,8 @@ end
 
 
 %%  Do something useful
-starting_formula = 'Workload ~ TrialOrder * Taskload+HR*SDNN*pNN50*RspAmp*RspRate*Sex*Age';
-%mdl = stepwiseglm(tabl,starting_formula,'Criterion','Deviance');
-og_formula = 'Workload ~ 1 + TrialOrder + Taskload + HR + SDNN + RspAmp + RspRate + BlinkCount+ PupilDiameter';
-mdl = fitglm(data,og_formula);
+formula = 'Workload ~ 1 + TrialOrder+SDNN*RspRate+RspAmp+RspRate*Age+ID+Taskload*HR + PupilDiameter + HR:PupilDiameter';
+mdl = fitglm(data,formula);
 figure('units','normalized','outerposition',[0 0 1 1]);
     
 j=1;
@@ -78,6 +76,7 @@ for i=1:12:180
     plot([1,10],[1,10],'-', 'Color', ColOrd(j,:));
     ylim([1,10])
     xlim([1,10])
+    title(strcat('20',string(j)));
     ylabel('Model Response');
     xlabel('Reported Workload');
     j = j+1;
