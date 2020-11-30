@@ -3,7 +3,9 @@ clear workspace;
 
 
 
-for id=201:201 %change to 215
+for id=201:215 %change to 215
+    try
+        display(strcat("PROCESSING...",string(id)));
 id = string(id);
 filepath = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part';
 in_filename = '\filtered_pilot_interval_pupil_positions.mat';
@@ -29,4 +31,9 @@ summary_table.TrialOrder = (1:12)';
 out_filename = '\eye_features_pilot_interval_summary_table.mat';
 save(strcat(filepath,id,out_filename),'summary_table');
 
+    catch ERR
+        display(ERR.message);
+        
+        display(strcat("Occurs on Line: ",string(ERR.stack.line)));
+    end
 end

@@ -1,9 +1,13 @@
 clear workspace;
 clear all;
 
-for idnum=1:1 %Change to 1:15
+for idnum=13:15 %Change to 1:15
 try
-id = strcat('20',string(idnum));
+    if (idnum>9)
+        id = strcat('2',string(idnum));
+    else
+        id = strcat('20',string(idnum));
+    end
 display(strcat('NOW PROCESSING ...',string(id)));
 filepath = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',id,'\');
 fn = 'eye_raw_features.mat';
@@ -125,8 +129,8 @@ hi_tl_indexes = trial_nums(subject_taskload == 4);
 low_tl_data = filtered_features_by_trial{low_tl_indexes}; %Get the data by the indexes
 med_tl_data = filtered_features_by_trial{med_tl_indexes};
 hi_tl_data = filtered_features_by_trial{hi_tl_indexes};
-workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload_noheader.csv');
-subject_workload = workload(:,idnum);
+workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
+subject_workload = workload(2:end,idnum);
 taskload_workload_table = table(subject_taskload, subject_workload, medians, means, blink_count, 'VariableNames',{'Taskload','Workload','Median','Mean','Blink Count'});
 
 filtered_features_by_trial(:,2) = {taskload_workload_table};
@@ -136,7 +140,7 @@ save(out_file,'filtered_features_by_trial');
 out_figure = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\figures\automated plots\',fig_title,'.jpg');
 saveas(gcf,out_figure);
 
-
+%% Plots
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 plot(subject_taskload, medians,'o','MarkerSize',10,'MarkerFaceColor','blue');
@@ -185,5 +189,6 @@ saveas(gcf,out_figure);
 
 catch ERR
     display(ERR.message);
+    display(strcat("Occurs on Line: ",ERR.stack.line));
 end
 end

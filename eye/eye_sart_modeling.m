@@ -61,7 +61,7 @@ end
 
 
 %%  Do something useful
-formula = 'Workload ~ 1 + TrialOrder+SDNN*RspRate+RspAmp+RspRate*Age+ID+Taskload*HR + PupilDiameter + HR:PupilDiameter';
+formula = 'SART ~ 1 + TrialOrder+SDNN*RspRate+RspAmp+RspRate*Age+ID+Taskload*HR + PupilDiameter + HR:PupilDiameter';
 mdl = fitglm(data,formula);
 figure('units','normalized','outerposition',[0 0 1 1]);
     
@@ -69,22 +69,22 @@ j=1;
 for i=1:12:180
     subplot(3,5,j); 
     hold on;
-    plot(workload(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
-    p = polyfit(workload(i:i+11),mdl.Fitted.Response(i:i+11),1);
-    yfit = polyval(p,workload(i:i+11));
+    plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+    p = polyfit(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),1);
+    yfit = polyval(p,data.SART(i:i+11));
     %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
-    plot([1,10],[1,10],'-', 'Color', ColOrd(j,:));
-    ylim([1,10])
-    xlim([1,10])
+    plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+    ylim([0,46])
+    xlim([0,46])
     title(strcat('20',string(j)));
     ylabel('Model Response');
-    xlabel('Reported Workload');
+    xlabel('SART Score');
     j = j+1;
     grid on;
     
 end
-topTitle = sprintf('Workload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
+topTitle = sprintf('SART Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted);
 
 suptitle(topTitle);
-fn = 'Workload Psychophysiological Regression Model Performance';
+fn = 'SART Psychophysiological Regression Model Performance Best Fit';
 %saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));
