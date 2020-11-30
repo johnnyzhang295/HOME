@@ -1,0 +1,7 @@
+blueRingCaught and greenRingCaught are the button press times for blue/green light secondary task
+
+Subject-whole data should be indexed as:
+blueRingCaught{n,1} where n = subject #
+
+Subject-trial data should be indexed as:
+blueRingCaught{n,1}{k} where n = subject #, k = Trial #
