@@ -1,25 +1,25 @@
-% ind = 1;
-% 
-% filepath = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part';
-% load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\buttonPressTimes.mat');
-% counter = 1;
-% mult = 199998;
-% features_by_trial = {zeros(12,1)};
-% for id=201
-% 
-%     
-%    id = string(id); 
-%    
-%    %Process ECG
-%    raw_eda_features = load(strcat(filepath,id,'\EDA data by trial.csv'));
-%    
-%    for j=(1:12)
-%     features_by_trial{j} = [raw_eda_features((j - 1)*mult+1:j*mult, 2) raw_eda_features((j - 1)*mult+1:j*mult, 6)];
-%    end
-%    
-%    counter = counter + 1;
-% 
-% end
+ind = 1;
+%clear all; clear workspace;
+filepath = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part';
+load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\buttonPressTimes.mat');
+counter = 1;
+mult = 199998;
+features_by_trial = {zeros(12,1)};
+for id=201
+
+    
+   id = string(id); 
+   
+   %Process ECG
+   raw_eda_features = load(strcat(filepath,id,'\EDA data by trial.csv'));
+   
+   for j=(1:12)
+    features_by_trial{j} = [raw_eda_features((j - 1)*mult+1:j*mult, 2) raw_eda_features((j - 1)*mult+1:j*mult, 6)];
+   end
+   
+   counter = counter + 1;
+
+end
 
 blues_by_trial= {zeros(12,1)};
 fig = figure('units','normalized','outerposition',[0 0 1 1]);
