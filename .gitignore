@@ -10,3 +10,4 @@ figures/*
 *.asv
 models/model coefficeints/*
 models/model figures/*
+*.jpg
