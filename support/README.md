@@ -9,7 +9,7 @@ taskload settings.csv is a [15 x 12] matrix where row vector 1 is subject 1, row
 
 
 
-IF YOU ARE SMARTER THAN ME YOU WILL USE THE FILES IN 'raw survey scores' DIRECTORY:
+IF YOU ARE SMARTER THAN ME YOU WILL USE THE FILES IN "HOME/support/raw survey scores"
 
 These all follow the same format: [12 x 15] matrix where column vector is subject data.
 
