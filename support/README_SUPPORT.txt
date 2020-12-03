@@ -1,6 +1,6 @@
 The sart, taskload, and workload all have different formats. This is because I suck at programming.
 
-sart.csv is a [180 x 1] column vector where rows 1-12 are subject 1, rows 13-25 are subject 2, etc.
+SARTScores.csv is a [180 x 1] column vector where rows 1-12 are subject 1, rows 13-25 are subject 2, etc.
 
 workload.csv is a [12 x 15] matrix where column vector 1 is subject 1, column vector 2 is subject 2, etc.
 
