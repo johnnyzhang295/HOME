@@ -6,7 +6,7 @@ This code is used for data processing, visualization, and analysis of psychophys
 
 **Support for trigger/timer, workload, taskload data is included as well.**
 
-**Please read the README_SUPPORT.txt file in support for proper data handling of survey scores**
+**Please read the README in HOME/support for proper data handling of survey scores**
 
 You should set up your file structure like so:
 
