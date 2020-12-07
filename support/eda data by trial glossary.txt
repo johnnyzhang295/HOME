@@ -1,0 +1,2 @@
+Indexes for EDA data by trial.csv
+EDA_Raw	EDA_Clean EDA_Tonic EDA_Phasic SCR_Onsets SCR_Peaks SCR_Height SCR_Amplitude 	SCR_RiseTime 	SCR_Recovery 	SCR_RecoveryTime 	Index 	Label 	Condition
