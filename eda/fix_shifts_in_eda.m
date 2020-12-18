@@ -3,22 +3,21 @@ clear all;
 clear workspace;
 
 participant = '201';
-trialno = 7;
+trialno = 8;
 
-actualtrial = trialno+1;
 load(strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',...
     participant,'\eda\EDA Pilot Interval Trial ',{' '},...
     string(trialno),'.csv'));
 
-x_axis = linspace(0,50,length(EDA_Pilot_Interval_Trial_7));
-y = EDA_Pilot_Interval_Trial_7(:,2);
+x_axis = linspace(0,50,length(EDA_Pilot_Interval_Trial_8));
+y = EDA_Pilot_Interval_Trial_8(:,2);
 
 
 figure;
 hold on;
 subplot(3,1,1);
 plot(x_axis,y);
-title(strcat('Original Data Participant: ',participant,' Trial No: ',string(actualtrial)));
+title(strcat('Original Data Participant: ',participant,' Trial No: ',string(trialno)));
 
 %% Change points + Plot
 % Find change points
