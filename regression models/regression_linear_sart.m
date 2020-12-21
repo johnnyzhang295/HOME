@@ -7,7 +7,7 @@ load('scaled centered normalized data.mat');
 data.pNN50(isnan(data.pNN50)) = 0;
 
 %Define model formula here
-formula = strcat('Workload ~ 1 + ID + Taskload*HR + Taskload:SCMeanPupilDiameter + TrialOrder:Taskload',...
+formula = strcat('SART ~ 1 + ID + Taskload*HR + Taskload:SCMeanPupilDiameter + TrialOrder:Taskload',...
     '+TrialOrder:HR + TrialOrder:pNN50 + HR:pNN50 + SDNN*pNN50 + RspRate:RspAmp');
 
 %Fit a generalized linear model
@@ -20,23 +20,23 @@ j=1;
 for i=1:12:180
     subplot(3,5,j); 
     hold on;
-    plot(data.Workload(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
-    p = polyfit(data.Workload(i:i+11),mdl.Fitted.Response(i:i+11),1);
-    yfit = polyval(p,data.Workload(i:i+11));
+    plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+    p = polyfit(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),1);
+    yfit = polyval(p,data.SART(i:i+11));
     %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
-    plot([1,10],[1,10],'-', 'Color', ColOrd(j,:));
-    ylim([1,10])
-    xlim([1,10])
+    plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+    ylim([0,46])
+    xlim([0,46])
     ylabel('Model Response');
-    xlabel('Reported Workload');
+    xlabel('SART Score');
     title(string(j));
     j = j+1;
     grid on;
     
 end
 topTitle = formula;
-topTitle = strcat(formula, sprintf('\nWorkload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
+topTitle = strcat(formula, sprintf('\n SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
 
 suptitle(topTitle);
-fn = 'Workload Psychophysiological Regression Model Performance';
+fn = 'SA Psychophysiological Regression Model Performance';
 %saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));

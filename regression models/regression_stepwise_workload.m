@@ -6,13 +6,15 @@ load('scaled centered normalized data.mat');
 
 data.pNN50(isnan(data.pNN50)) = 0;
 
+data.SART = [];
+
+
 %Define model formula here
 formula = strcat('Workload ~ 1 + ID + Taskload*HR + Taskload:SCMeanPupilDiameter + TrialOrder:Taskload',...
-    '+TrialOrder:HR + TrialOrder:pNN50 + HR:pNN50 + SDNN*pNN50 + RspRate:RspAmp');
+    '+TrialOrder:HR  + HR:pNN50 + SDNN*pNN50 + pNN50:TrialOrder + RspRate:RspAmp');
 
 %Fit a generalized linear model
-mdl = fitglm(data,formula);
-
+mdl = stepwiseglm(data,formula,'Criterion','aic');
 
 figure('units','normalized','outerposition',[0 0 1 1]);
 
@@ -34,9 +36,10 @@ for i=1:12:180
     grid on;
     
 end
+formula="";
 topTitle = formula;
-topTitle = strcat(formula, sprintf('\nWorkload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
+topTitle = strcat(formula, sprintf('\nWorkload Stepwise Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
 
 suptitle(topTitle);
-fn = 'Workload Psychophysiological Regression Model Performance';
+fn = 'Workload Stepwise Regression Model Performance';
 %saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',fn,'.jpg'));
