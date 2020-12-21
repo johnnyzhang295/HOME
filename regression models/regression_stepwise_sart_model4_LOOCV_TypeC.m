@@ -17,7 +17,7 @@ data_without_ID.ID = [];
 %Add ID Term bc this is Model 4s
 from_stepwise = strcat('SART ~ ID + 1 + TrialOrder + HR*RspRate + RMSSD*Age + RMSSD*Sex',...
           '+ RMSSD*Taskload + SDNN*pNN50 + RspAmp*RspRate',...
-          '+ SCBlinkCount*Age + Age*Sex + Sex*Taskload');
+          '+ SCBlinkCount*Age + Age*Sex + Sex*Taskload-RspAmp:RspRate - Sex- 1 - HR - RMSSD - RspAmp - RspRate - HR:RspRate');
           
 manual_fitting = strcat(from_stepwise);
 %STEP THREE: Add manual terms from correlation plot and evaluate
@@ -106,7 +106,7 @@ topTitle = sprintf('LOOCV Type C For SA Model 4\nQ^{2} = %4.2f ',overall_q_sq);
 
 suptitle(topTitle);
 filename = 'LOOCV Type C for SA Model 4';
-saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\type3 models\',filename,'.jpg'));
+saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\type4 models\',filename,'.jpg'));
 
 %LOO_data should include the workload/SA value
 function [q_sq, term_1, term_2] = calculate_q_sq(LOO_data, CV_data, mdl)
