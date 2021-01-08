@@ -8,7 +8,7 @@ load('baselined_data.mat');
 data = baselined_data;
 
 data.pNN50(isnan(data.pNN50)) = 0;
-data.Workload = [];
+data.SART = [];
 data_without_ID = data;
 data_without_ID.ID = [];
 
@@ -21,33 +21,33 @@ data_without_TL.Taskload = [];
 
 %% Type 1 Model
 formula_1 = ...
-"SART ~ 1 + HR*RspAmp + HR*MeanPupilDiameter + RMSSD*SDNN + RMSSD*RspRate + SDNN*RspRate"+...
+"Workload ~ 1 + HR*RspAmp + HR*MeanPupilDiameter + RMSSD*SDNN + RMSSD*RspRate + SDNN*RspRate"+...
          " + SDNN*MeanPupilDiameter + RspAmp*MeanPupilDiameter";
-%mdl_1 = stepwiseglm(data_without_TL, formula_1,'Criterion','aic');
-mdl_1 = fitglm(data_without_TL, formula_1);
+mdl_1 = stepwiseglm(data_without_TL, formula_1,'Criterion','aic');
+%mdl_1 = fitglm(data_without_TL, formula_1);
 type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
 [type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
 [type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1);
 
 %% Type 2 Model
 formula_2 = ...
-    "SART ~ 1 + MeanPupilDiameter + TrialOrder + RMSSD*Taskload + SDNN*pNN50"+...
+    "Workload ~ 1 + MeanPupilDiameter + TrialOrder + RMSSD*Taskload + SDNN*pNN50"+...
           "+ pNN50*RspRate + RspAmp*RspRate + RspAmp*Taskload + RspRate*Taskload";
-%mdl_2 = stepwiseglm(data_without_demographics, formula_2,'Criterion','aic');
-mdl_2 = fitglm(data_without_demographics, formula_2);
+mdl_2 = stepwiseglm(data_without_demographics, formula_2,'Criterion','aic');
+%mdl_2 = fitglm(data_without_demographics, formula_2);
 type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
 [type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
 [type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2);
 
 %% Type 3 Model
 formula_3 = ...
-    "SART ~ 1 + HR*TrialOrder + RMSSD*Age + RMSSD*Sex + RMSSD*Taskload + RMSSD*TrialOrder"+...
+    "Workload ~ 1 + HR*TrialOrder + RMSSD*Age + RMSSD*Sex + RMSSD*Taskload + RMSSD*TrialOrder"+...
           "+ SDNN*MeanPupilDiameter + pNN50*Sex + RspRate*BlinkCount + RspRate*Age"+...
           "+ RspRate*Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex"+...
           "+ BlinkCount*Age + BlinkCount*Sex + BlinkCount*TrialOrder + Age*Sex" +...
           "+ Sex*Taskload";
-%mdl_3 = stepwiseglm(data_without_ID,formula_3,'Criterion','aic');
-mdl_3 = fitglm(data_without_ID,formula_3);
+mdl_3 = stepwiseglm(data_without_ID,formula_3,'Criterion','aic');
+%mdl_3 = fitglm(data_without_ID,formula_3);
 type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
 [type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
 [type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3);
@@ -55,37 +55,37 @@ type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
 %% Type 4 Model
 
 formula_4 = ...
-    "SART ~ 1 + ID + HR + SDNN  + Taskload + TrialOrder + HR:pNN50 + HR:RspRate " +...
+    "Workload ~ 1 + ID + HR + SDNN  + Taskload + TrialOrder + HR:pNN50 + HR:RspRate " +...
           "+ RMSSD:Taskload + HR:TrialOrder + RMSSD:TrialOrder";      
       
-%mdl_4 = stepwiseglm(data,formula_4,'Criterion','aic');
-mdl_4 = fitglm(data,formula_4 );
+mdl_4 = stepwiseglm(data,formula_4,'Criterion','aic');
+%mdl_4 = fitglm(data,formula_4 );
 type_4_f1 = plotMdl(mdl_4,data, 4);
 % We cannot do LOOCV_B for Model types 4 and 5
 [type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4);
 
 %% Save models
 %Save Figs
-savePlots(type_1_f1, 1, '0');
-savePlots(type_1_f2, 1, 'B');
-savePlots(type_1_f3, 1, 'C');
-
-savePlots(type_2_f1, 2, '0');
-savePlots(type_2_f2, 2, 'B');
-savePlots(type_2_f3, 2, 'C');
-
-savePlots(type_3_f1, 3, '0');
-savePlots(type_3_f2, 3, 'B');
-savePlots(type_3_f3, 3, 'C');
-
-savePlots(type_4_f1, 4, '0');
-savePlots(type_4_f3, 4, 'C');
-
-%Save Coeffs
-saveCoeffs(mdl_1, 1);
-saveCoeffs(mdl_2,2);
-saveCoeffs(mdl_3,3);
-saveCoeffs(mdl_4,4);
+% savePlots(type_1_f1, 1, '0');
+% savePlots(type_1_f2, 1, 'B');
+% savePlots(type_1_f3, 1, 'C');
+% 
+% savePlots(type_2_f1, 2, '0');
+% savePlots(type_2_f2, 2, 'B');
+% savePlots(type_2_f3, 2, 'C');
+% 
+% savePlots(type_3_f1, 3, '0');
+% savePlots(type_3_f2, 3, 'B');
+% savePlots(type_3_f3, 3, 'C');
+% 
+% savePlots(type_4_f1, 4, '0');
+% savePlots(type_4_f3, 4, 'C');
+% 
+% %Save Coeffs
+% saveCoeffs(mdl_1, 1);
+% saveCoeffs(mdl_2,2);
+% saveCoeffs(mdl_3,3);
+% saveCoeffs(mdl_4,4);
 
 
 
@@ -115,13 +115,13 @@ function fig = plotMdl(mdl, data, type)
     for i=1:12:180
         subplot(3,5,j);
         hold on;
-        plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
-        p = polyfit(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),1);
-        yfit = polyval(p,data.SART(i:i+11));
+        plot(data.Workload(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+        p = polyfit(data.Workload(i:i+11),mdl.Fitted.Response(i:i+11),1);
+        yfit = polyval(p,data.Workload(i:i+11));
         %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
-        plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
-        ylim([0,46])
-        xlim([0,46])
+        plot([0,10],[0,10],'-', 'Color', ColOrd(j,:));
+        ylim([0,10])
+        xlim([0,10])
         ylabel('Model Response');
         xlabel('SART Score');
         title(string(j));
@@ -131,7 +131,7 @@ function fig = plotMdl(mdl, data, type)
     end
     formula="";
     topTitle = formula;
-    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
+    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' Workload Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
 
     suptitle(topTitle);
 
@@ -161,12 +161,12 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         y = mdl.predict(LOO_data);
         subplot(3, 5,j);
         hold on;
-        plot(LOO_data.SART, y,'o','Color',ColOrd(j,:));
-        plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
-        ylim([0,46])
-        xlim([0,46])
-        ylabel('Predicted SA Response');
-        xlabel('SART Score');
+        plot(LOO_data.Workload, y,'o','Color',ColOrd(j,:));
+        plot([0,10],[0,10],'-', 'Color', ColOrd(j,:));
+        ylim([0,10])
+        xlim([0,10])
+        ylabel('Predicted Workload Response');
+        xlabel('Workload Score');
         title(string(j));
         grid on;
 
@@ -176,7 +176,7 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     q_sqs = q_sqs';
 
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For Workload \nQ^{2} = %4.2f ',overall_q_sq));
 
     suptitle(topTitle);
 end
@@ -202,14 +202,14 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula)
         mdls(j) = {mdl};
         y = mdl.predict(LOO_data(1, 1:end-1));
         all_ys(j) = y;
-        all_xs(j) = LOO_data.SART;
+        all_xs(j) = LOO_data.Workload;
         hold on;
-        plot(LOO_data.SART, y,'o','Color','r');
-        plot([0,46],[0,46],'-','Color','b');
-        ylim([0,46])
-        xlim([0,46])
-        ylabel('Predicted SA Response');
-        xlabel('Subject SART Score');
+        plot(LOO_data.Workload, y,'o','Color','r');
+        plot([0,10],[0,10],'-','Color','b');
+        ylim([0,10])
+        xlim([0,10])
+        ylabel('Predicted Workload Response');
+        xlabel('Subject Workload Score');
         %title(string(j));
         grid on;
 
@@ -217,15 +217,15 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula)
     end
 
     p = polyfit(all_xs,all_ys,1);
-    yfit = polyval(p,(0:46));
-    plot((0:46),yfit,'-','Color','r','HandleVisibility','off');
+    yfit = polyval(p,(0:10));
+    plot((0:10),yfit,'-','Color','r','HandleVisibility','off');
 
     mdls = mdls';
     q_sqs = q_sqs';
 
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
 
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type C For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type C For Workload \nQ^{2} = %4.2f ',overall_q_sq));
 
     suptitle(topTitle);
 end
