@@ -40,6 +40,8 @@ load('ekg_experiment.mat');
 % 
 % rsp = [r201; r202; r203; r204; r205; r206; r207; r208; r209; r210; r211; r212; r213; r214; r215;];
 
+
+% Fix old data
 % data{:,'RspAmp'} = rsp(:,3);
 % data{:,'RspRate'} = rsp(:,4);
 
@@ -99,3 +101,8 @@ baselined_data{:,1:4} = data{:,1:length(ekg_features_baseline_index)} - ekg_feat
 baselined_data{:,5:6} = data{:,5:6} - rsp_features_baseline{:,:};
 
 %save('baselined data.mat','baselined_data');
+
+%% Make baseline data set
+
+control_features = [ekg_table(:,ekg_features_baseline_index) rsp_table(:,rsp_features_baseline_index)]
+%save('control data.mat', 'control_features');
