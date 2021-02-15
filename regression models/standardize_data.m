@@ -1,24 +1,25 @@
 clear all;
 clear workspace;
 
-%This file is generated from eye/workload modeling
-load('raw data.mat');
+% load ('transformed raw data.mat')
 
-phys_measures = data{:,1:5};
+% transformed_raw_data = raw_data;
+% transformed_raw_data.ECG_Rate_Mean = log(transformed_raw_data.ECG_Rate_Mean);
+% transformed_raw_data.RSP_Amplitude = log(transformed_raw_data.RSP_Amplitude);
+% transformed_raw_data.BlinkCount = sqrt(transformed_raw_data.BlinkCount);
+% transformed_raw_data.HRV_pNN50 = sqrt(transformed_raw_data.HRV_pNN50);
+% save('transformed raw data.mat', 'transformed_raw_data');
+%stan = x - mu / sigma
 
-scn_data = [zeros(180,5)];
-individ_phys = {};
-j=1;
-for i=(1:12:180)
-    individ_phys(j,1) = {normalize(phys_measures(i:i+11,:))};
-    
-    scn_data(i:i+11,:) = individ_phys{j,1};
-    
-    j=j+1;
-    
-end
+%perform standardization within subjects
+% standardized_raw_data = raw_data;
+% for (i=1:12:180)
+%     standardized_raw_data(i:i+11,1:19) = normalize(raw_data(i:i+11,1:19));
+% end
+% save('standardized raw data.mat', 'standardized_raw_data')
 
-data{:,1:5} = scn_data;
-%save('scaled centered data.mat');
-
-
+% standardized_transformed_raw_data = transformed_raw_data;
+% for (i=1:12:180)
+%     standardized_transformed_raw_data(i:i+11,1:19) = normalize(transformed_raw_data(i:i+11,1:19));
+% end
+% save('standardized and transformed raw data.mat', 'standardized_transformed_raw_data')
