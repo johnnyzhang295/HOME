@@ -165,11 +165,15 @@ function fig = plotMdl(mdl, data, type)
     for i=1:12:180
         subplot(3,5,j);
         hold on;
-        plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:));
+        plot(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),'o','Color',ColOrd(j,:), 'HandleVisibility','off');
+        
         p = polyfit(data.SART(i:i+11),mdl.Fitted.Response(i:i+11),1);
         yfit = polyval(p,data.SART(i:i+11));
-        %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
+        
         plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+        
+        legend("Ideal Relationship");
+        %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
         ylim([0,46])
         xlim([0,46])
         ylabel('Model Response');
@@ -179,6 +183,7 @@ function fig = plotMdl(mdl, data, type)
         grid on;
 
     end
+        
     formula="";
     topTitle = formula;
     topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
@@ -212,11 +217,15 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         subplot(3, 5,j);
         hold on;
         plot(LOO_data.SART, y,'o','Color',ColOrd(j,:));
-        plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+        
         ylim([0,46])
         xlim([0,46])
         ylabel('Predicted SA Response');
         xlabel('SART Score');
+        
+        plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
+        legend("Predicted Subject", "Ideal Relationship");
+        
         title(string(j));
         grid on;
 
@@ -225,6 +234,8 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     mdls = mdls';
     q_sqs = q_sqs';
 
+    
+    
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
     topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For SA \nQ^{2} = %4.2f ',overall_q_sq));
 
