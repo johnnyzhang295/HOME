@@ -29,6 +29,7 @@ mdl_1 = fitglm(data_without_TL, formula_1);
 pie_1 = pieChartModel(mdl_1.CoefficientNames);
 [type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
 [type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
+type_1_f4 = plotRes(mdl_1);
 
 %% Type 2 Model
 formula_2 = ...
@@ -39,7 +40,7 @@ type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
 pie_2 = pieChartModel(mdl_2.CoefficientNames);
 [type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
 [type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
-
+type_2_f4 = plotRes(mdl_2);
 %% Type 3 Model
 formula_3 = ...
     'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
@@ -50,40 +51,50 @@ type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
 pie_3 = pieChartModel(mdl_3.CoefficientNames);
 [type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
 [type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3, type_1_f3, 3);
-
+type_3_f4 = plotRes(mdl_3);
 
 %% Save models
 %Save Figs
-save = 0;
+save = 1;
 if (save == 1)
     savePlots(type_1_f1, 1, '0');
     savePlots(type_1_f2, 1, 'B');
     savePlots(type_1_f3, 1, 'C');
     savePlots(pie_1, 1, 'p')
+    savePlots(type_1_f4, 1, 'R');
 
     savePlots(type_2_f1, 2, '0');
     savePlots(type_2_f2, 2, 'B');
-    savePlots(type_2_f3, 2, 'C');
     savePlots(pie_2, 2, 'p')
+    savePlots(type_2_f4, 2, 'R');
 
     savePlots(type_3_f1, 3, '0');
     savePlots(type_3_f2, 3, 'B');
-    savePlots(type_3_f3, 3, 'C');
     savePlots(pie_3, 3, 'p')
+    savePlots(type_3_f4, 3, 'R');
 
-    savePlots(type_4_f1, 4, '0');
-    savePlots(type_4_f3, 4, 'C');
-    savePlots(pie_4, 4, 'p')
 
     %Save Coeffs
     saveCoeffs(mdl_1, 1);
     saveCoeffs(mdl_2,2);
     saveCoeffs(mdl_3,3);
-    saveCoeffs(mdl_4,4);
 end
 
 
 %% Helper Functions
+function fig = plotRes(mdl)
+    fig = figure('units','normalized','outerposition',[0 0 1 1]);
+    
+    subplot(1,3,1)
+    plotResiduals(mdl);
+    subplot(1,3,2)
+    plotResiduals(mdl,'probability')
+    subplot(1,3,3)
+    plotResiduals(mdl,'fitted')
+    
+    sgtitle('Residual Analysis')
+end
+
 function fig = pieChartModel(coeffs)
 
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
@@ -319,6 +330,11 @@ function [] = savePlots(fig, type, LOOCV)
     
      if (LOOCV == 'p')
         saveas(fig, strcat(path,'pie chart ', string(type), '.jpg'));
+        return;
+     end
+     
+     if (LOOCV == 'R')
+        saveas(fig, strcat(path,'Residuals for Model  ', string(type), '.jpg'));
         return;
      end
      
