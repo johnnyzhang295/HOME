@@ -44,8 +44,10 @@ type_2_f4 = plotRes(mdl_2);
 %% Type 3 Model
 formula_3 = ...
     'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
+formula_3 = ...
+    'SART~ 1 -TrialOrder - Taskload  + ECG_Rate_Mean*TrialOrder + HRV_MeanNN*RSP_Amplitude + RSP_Rate*Taskload + RSP_Rate*TrialOrder + Sex*Taskload'
 
-%mdl_3 = stepwiseglm(data_without_ID, formula_3, 'Criterion', 'aic');
+%mdl_3 = stepwiseglm(data_without_ID);
 mdl_3 = fitglm(data_without_ID,formula_3);
 type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
 pie_3 = pieChartModel(mdl_3.CoefficientNames);
@@ -105,44 +107,33 @@ function fig = pieChartModel(coeffs)
     observable_count = 0;
     
     size = length(coeffs);
-    labels = {};
+    labels = {'EKG','RSP','EYE','OBSERVABLES','DEMOGRAPHICS'};
     pie_data = [];
     
     for (i=1:size)
        if contains(coeffs{1,i}, ["HRV","ECG"])
           ekg_count = ekg_count + 1; 
-          labels{1} = "EKG";
-          pie_data(1) = ekg_count; 
+          
        end
        if contains(coeffs{1,i}, "RSP")
           rsp_count = rsp_count + 1;
-          labels{2} = "RSP";
-          pie_data(2) = rsp_count; 
        end
        if contains(coeffs{1,i}, ["BlinkCount","Pupil"])
           eye_count = eye_count + 1; 
-          labels{3} = "EYE";
-          pie_data(3) = eye_count; 
        end
        if contains(coeffs{1,i}, ["Taskload","TrialOrder"])
           observable_count = observable_count + 1; 
-          labels{4} = "OBSERVABLES";
-          pie_data(4) = observable_count; 
        end
        if contains(coeffs{1,i}, ["Age","Sex_0","ID"])
           demo_count = demo_count + 1; 
-          labels{5} = "DEMOGRAPHICS";
-          pie_data(5) = demo_count; 
        end
 
     end
+    pie_data = [ekg_count, rsp_count, eye_count, observable_count, demo_count];
     
-    for (j=1:length(labels))
-        if isempty(labels{:,j})
-            pie_data(j) = [];
-        end
-        
-    end
+    labels(find(~pie_data)) = [];
+    
+    pie_data = nonzeros(pie_data)';
     
     
     pie(pie_data, labels);
