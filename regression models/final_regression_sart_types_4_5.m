@@ -19,6 +19,7 @@ data_without_demographics.Sex = [];
 data_without_TL = data_without_demographics;
 data_without_TL.Taskload = [];
 
+
 %% Type 4 Model
 formula_4 = ...
     'SART~1 + HRV_RMSSD + HRV_SDSD + ID + HRV_SDNN:MeanPupilDiameter + RSP_Rate:MeanPupilDiameter + HRV_RMSSD:Taskload + RSP_Rate:Taskload + HRV_RMSSD:TrialOrder + HRV_SDSD:TrialOrder'
@@ -31,22 +32,23 @@ mdl_4 = fitglm(data,formula_4 );
 %type_4_f1 = plotMdl(mdl_4,data, 4);
 %pie_4 = pieChartModel(mdl_4.CoefficientNames);
 % We cannot do LOOCV_B for Model types 4 and 5
+[type_4_f2, type_4_q_sq_B] = LOOCV_B(mdl_4,data, 4, formula_4)
 %[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4, "", 1);
 %[type_4_f5, type_4_q_sq_D] = LOOCV_D(data, 4, formula_4, '+ID') %You need to feed a model 3 formula into LOOCV D
-type_4_f4 = plotRes(mdl_4);
+% type_4_f4 = plotRes(mdl_4);
 
 %% Type 5 Model
 formula_5 = ...
     'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
 %mdl_5 = stepwiseglm(data);
-mdl_5 = fitglm(data,formula_5 );
-%type_5_f1 = plotMdl(mdl_5,data, 5);
-%pie_5 = pieChartModel(mdl_5.CoefficientNames);
-% We cannot do LOOCV_B for Model types 4 and 5
-%[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
-%[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
-
-type_5_f4 = plotRes(mdl_5);
+% mdl_5 = fitglm(data,formula_5 );
+% %type_5_f1 = plotMdl(mdl_5,data, 5);
+% %pie_5 = pieChartModel(mdl_5.CoefficientNames);
+% % We cannot do LOOCV_B for Model types 4 and 5
+% %[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
+% %[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
+% 
+% type_5_f4 = plotRes(mdl_5);
 
 
 
@@ -74,6 +76,46 @@ end
 
 
 %% Helper Functions
+function [y_int,SSR] = find_y_intercept(survey_scores, model_predictions)
+    actual_sart_scores = survey_scores; 
+    model_values = model_predictions;
+
+    initial_params = [5]; 
+    [y_int,SSR] = fminsearch(@(y_int) model_fun(y_int,actual_sart_scores,model_values), initial_params);
+%     %% plot
+%     ColOrd = rand(15,3);
+%     figure; 
+%     subplot(1,2,1)
+%     scatter(actual_sart_scores,model_values)
+%     xlim([0 46])
+%     ylim([0 46])
+%     hold on
+%     plot([0,46],[0,46],'-')
+%     subplot(1,2,2)
+%     fitted = model_values + y_int;
+%     hold on;
+%     plot(actual_sart_scores, fitted, 'o', 'Color', ColOrd(2,:))
+%     xlim([0 46])
+%     ylim([0 46])
+%     plot([0,46],[0,46],'-')
+    %% end plot
+
+    function SSR = model_fun(y_int, actual_score, yhat)
+
+        Y = actual_score; % the measurements
+
+        [rows, cols] = size(Y);
+
+        Yhat_with_estimate = zeros(rows, cols);
+        for i = 1:rows
+            Yhat_with_estimate(i) = y_int + yhat(i);
+        end
+
+        SSR = sum((Y-Yhat_with_estimate).^2);
+
+    end
+end
+
 function fig = plotRes(mdl)
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
     
@@ -150,6 +192,24 @@ function [q_sq, term_1, term_2] = calculate_q_sq(LOO_data, CV_data, mdl)
 
 end
 
+%LOO_data should include the either workload or SA value
+function [q_sq, term_1, term_2] = calculate_q_sq_LOOCV_B(LOO_data, CV_data, mdl, y_int)
+   
+    
+    Y = LOO_data{:, end};
+    Y_hat_miss_i = mdl.predict(LOO_data(:, 1:end -1)) + y_int;
+    
+    Y_bar_miss_i = mean(CV_data{:,end});
+    
+    term_1 = sum((Y - Y_hat_miss_i).^2);
+    term_2 = sum((Y - Y_bar_miss_i).^2);
+    
+    q_sq = 1 - (term_1/term_2);
+        
+        
+
+end
+
 function fig = plotMdl(mdl, data, type)
     global ColOrd;
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
@@ -188,10 +248,14 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     global ColOrd;
     
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
+    set(fig,'Position', [0.0026   -0.7870    0.7917    0.7083]);
+
     mdls = {};
     q_sqs = [];
     numerators = [];
     denoms = [];
+    
+    total_ssr = 0;
     for j = (1:15)
         if (j < 10)
             LOO_id = strcat('20',string(j));
@@ -206,6 +270,13 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         mdl = fitglm(CV_data,formula);
         mdls(j) = {mdl};
         y = mdl.predict(LOO_data);
+        
+        
+        [y_int, SSR] = find_y_intercept(LOO_data.SART, y);
+        
+        y = y + y_int;
+        total_ssr = total_ssr + SSR;
+        
         subplot(3, 5,j);
         hold on;
         plot(LOO_data.SART, y,'o','Color',ColOrd(j,:));
@@ -221,7 +292,8 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         title(string(j));
         grid on;
 
-        [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,mdl);
+        %We pass in the new Y-intercept for LOOCV_B
+        [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq_LOOCV_B(LOO_data,CV_data,mdl, y_int);
     end
     mdls = mdls';
     q_sqs = q_sqs';
@@ -229,9 +301,9 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     
     
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For SA \nQ^{2} = %4.2f, Total SSR = %4.2f ',overall_q_sq, total_ssr));
 
-    suptitle(topTitle);
+    sgtitle(topTitle);
 end
 
 function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_position)
