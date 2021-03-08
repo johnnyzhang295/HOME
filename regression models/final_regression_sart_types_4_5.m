@@ -28,11 +28,11 @@ formula_D = ...
 
 %mdl_4 = stepwiseglm(data,formula_4);
 mdl_4 = fitglm(data,formula_4 );
-type_4_f1 = plotMdl(mdl_4,data, 4);
-pie_4 = pieChartModel(mdl_4.CoefficientNames);
+%type_4_f1 = plotMdl(mdl_4,data, 4);
+%pie_4 = pieChartModel(mdl_4.CoefficientNames);
 % We cannot do LOOCV_B for Model types 4 and 5
-[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4, "", 1);
-[type_4_f5, type_4_q_sq_D] = LOOCV_D(data, 4, formula_D, '+ID') %You need to feed a model 3 formula into LOOCV D
+%[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4, "", 1);
+%[type_4_f5, type_4_q_sq_D] = LOOCV_D(data, 4, formula_4, '+ID') %You need to feed a model 3 formula into LOOCV D
 type_4_f4 = plotRes(mdl_4);
 
 %% Type 5 Model
@@ -40,11 +40,11 @@ formula_5 = ...
     'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
 %mdl_5 = stepwiseglm(data);
 mdl_5 = fitglm(data,formula_5 );
-type_5_f1 = plotMdl(mdl_5,data, 5);
-pie_5 = pieChartModel(mdl_5.CoefficientNames);
+%type_5_f1 = plotMdl(mdl_5,data, 5);
+%pie_5 = pieChartModel(mdl_5.CoefficientNames);
 % We cannot do LOOCV_B for Model types 4 and 5
-[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
-[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_D, '+ID*Taskload + ID:TrialOrder') %You need to feed a model 3 formula into LOOCV D
+%[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
+%[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
 
 type_5_f4 = plotRes(mdl_5);
 
@@ -53,7 +53,7 @@ type_5_f4 = plotRes(mdl_5);
 
 %% Save models
 %Save Figs
-save = 1;
+save = 0;
 if (save == 1)
 
     savePlots(type_4_f1, 4, '0');
@@ -80,9 +80,9 @@ function fig = plotRes(mdl)
     subplot(1,3,1)
     plotResiduals(mdl);
     subplot(1,3,2)
-    plotResiduals(mdl,'probability')
+    plotResiduals(mdl,'probability','ResidualType','Pearson')
     subplot(1,3,3)
-    plotResiduals(mdl,'fitted')
+    plotResiduals(mdl,'fitted','ResidualType','Pearson')
     
     sgtitle('Residual Analysis')
 end
