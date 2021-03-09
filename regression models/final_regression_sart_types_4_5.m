@@ -41,7 +41,8 @@ mdl_4 = fitglm(data,formula_4 );
 formula_5 = ...
     'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
 %mdl_5 = stepwiseglm(data);
-% mdl_5 = fitglm(data,formula_5 );
+ mdl_5 = fitglm(data,formula_5 );
+ [type_5_f2, type_5_q_sq_B] = LOOCV_B(mdl_5,data, 5, formula_5)
 % %type_5_f1 = plotMdl(mdl_5,data, 5);
 % %pie_5 = pieChartModel(mdl_5.CoefficientNames);
 % % We cannot do LOOCV_B for Model types 4 and 5
