@@ -1,0 +1,72 @@
+formula: 
+resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + MedianNN:MeanPupilDiameter
+data:    predictors
+
+ link  threshold nobs logLik  AIC    niter max.grad cond.H 
+ logit flexible  180  -239.25 564.51 8(0)  1.87e-07 1.3e+17
+
+Coefficients:
+                               Estimate Std. Error z value Pr(>|z|)    
+HR                            3.921e+00  1.353e+00   2.898 0.003750 ** 
+RMSSD                         2.184e-01  2.692e-01   0.811 0.417195    
+MeanNN                       -8.271e-01  1.979e-01  -4.179 2.93e-05 ***
+SDNN                         -2.515e-02  2.931e-01  -0.086 0.931603    
+CVNN                          1.384e+02  1.710e+02   0.809 0.418245    
+CVSD                         -1.620e+02  1.776e+02  -0.912 0.361708    
+MedianNN                      1.161e+00  2.330e-01   4.985 6.19e-07 ***
+MadNN                        -4.467e+00  1.398e+00  -3.196 0.001392 ** 
+MCVNN                         1.215e+03  4.934e+02   2.463 0.013765 *  
+pNN50                        -4.630e-02  6.417e-02  -0.721 0.470630    
+pNN20                         6.588e-01  1.739e-01   3.788 0.000152 ***
+TINN                         -2.395e-02  1.368e-02  -1.750 0.080061 .  
+RSP_Amplitude                 4.087e+00  9.491e-01   4.307 1.66e-05 ***
+RSP_Rate                      2.324e-01  1.204e-01   1.930 0.053601 .  
+MeanPupilDiameter            -6.359e+00  2.927e+00  -2.172 0.029819 *  
+BlinkCount                    7.932e-01  2.016e-01   3.935 8.32e-05 ***
+Age                           3.286e+01  8.579e+00   3.830 0.000128 ***
+Taskload                      8.019e+00  1.706e+00   4.701 2.59e-06 ***
+TrialOrder                   -5.628e-01  5.668e-01  -0.993 0.320736    
+MeanNN:MadNN                  3.513e-03  9.939e-04   3.534 0.000409 ***
+RSP_Amplitude:Taskload       -3.419e-01  9.711e-02  -3.520 0.000431 ***
+MCVNN:TINN                    5.872e-01  2.141e-01   2.743 0.006082 ** 
+MeanPupilDiameter:TrialOrder -1.458e-01  5.435e-02  -2.683 0.007297 ** 
+BlinkCount:Age               -2.971e-02  8.102e-03  -3.667 0.000246 ***
+pNN50:RSP_Amplitude           4.242e-02  1.382e-02   3.069 0.002150 ** 
+RSP_Amplitude:RSP_Rate       -1.209e-01  3.635e-02  -3.327 0.000879 ***
+Age:TrialOrder                5.019e-02  1.716e-02   2.925 0.003450 ** 
+pNN20:MeanPupilDiameter      -9.177e-02  2.344e-02  -3.915 9.06e-05 ***
+MedianNN:Age                 -2.244e-02  5.781e-03  -3.881 0.000104 ***
+HR:Age                       -1.875e-01  5.203e-02  -3.603 0.000314 ***
+Age:Taskload                 -1.701e-01  6.531e-02  -2.604 0.009215 ** 
+CVNN:pNN20                   -2.749e+00  1.271e+00  -2.162 0.030604 *  
+MeanNN:MeanPupilDiameter      9.762e-02  3.044e-02   3.207 0.001340 ** 
+MedianNN:MeanPupilDiameter   -8.265e-02  2.862e-02  -2.888 0.003880 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold coefficients:
+     Estimate Std. Error z value
+1|2     626.8      222.8   2.814
+2|3     628.1      222.8   2.819
+3|4     632.0      222.9   2.835
+4|5     634.0      222.9   2.844
+5|6     636.0      223.0   2.852
+6|7     637.7      223.0   2.860
+7|8     639.7      223.0   2.869
+8|9     640.3      223.0   2.872
+9|10    642.0      223.0   2.879
+
+$Pseudo.R.squared.for.model.vs.null
+                             Pseudo.R.squared
+McFadden                             0.300873
+Cox and Snell (ML)                   0.681471
+Nagelkerke (Cragg and Uhler)         0.697027
+
+$Likelihood.ratio.test
+ Df.diff LogLik.diff  Chisq    p.value
+     -34     -102.96 205.93 1.7306e-26
+
+$Number.of.observations
+          
+Model: 180
+Null:  168

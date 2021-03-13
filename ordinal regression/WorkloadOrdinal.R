@@ -6,10 +6,16 @@ library(plotly)
 library(rcompanion)
 #the directory where your .mat file is
 setwd("~/Zhang/HOME/ordinal regression") 
-# a .mat file with 2 matrices: one with predictors and one with Bedford scores
-matlabData <- (readMat("workloadData.mat")) 
+
+
+make_models <- function(type, size) {
+  
+  # a .mat file with 2 matrices: one with predictors and one with Bedford scores
+  matlabData <- (readMat("workloadData.mat")) 
+  
+  
 #matlabData$bigX is your matlab matrix containing predictor variables
-predictors <- as.data.frame(matlabData$bigX[1:180,1:22]) 
+predictors <- as.data.frame(matlabData$bigX[1:180,]) 
 colnames(predictors)[1] = 'HR';
 colnames(predictors)[2] = 'RMSSD';
 colnames(predictors)[3] = 'MeanNN';
@@ -33,22 +39,24 @@ colnames(predictors)[20] = 'Age';
 colnames(predictors)[21] = 'Taskload';
 colnames(predictors)[22] = 'TrialOrder';
 
+#predictors = predictors[1:180, -20]; # for model type 2
+predictors = predictors[1:180, 1:size]; # for model types 1,3
 #matlabData$bigY is your matlab matrix containing Bedford scores
 resp <- factor(matlabData$bigY[1:180], ordered=TRUE)
 #start with model including all terms and 2nd order interactions
 ordModel <- clm(resp ~ ., data = predictors)
 
-finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + 
-                       MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + 
-                       MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + 
-                       MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + 
-                       BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + 
-                       Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + 
-                       HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + 
-                       MedianNN:MeanPupilDiameter, data=predictors)
+# finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + 
+#                        MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + 
+#                        MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + 
+#                        MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + 
+#                        BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + 
+#                        Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + 
+#                        HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + 
+#                        MedianNN:MeanPupilDiameter, data=predictors)
   
   #stepwise fit according to AIC
-#finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=20)
+finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=4)
 #show resulting model terms
 summary(finalOrdModel)
 #Find pseudo-Rsquareds
@@ -61,13 +69,14 @@ predictedBedfordAll <- c()
 for (out in c(1:180)){
   
   #predict left out observation
-  prediction <-predict(finalOrdModel,predictors[out,1:22])
+  prediction <-predict(finalOrdModel,predictors[out,1:size])
   predictedBedford <- which.max(prediction$fit)
   #record in vector
   predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
 }
 
-writeMat('type_3_ModelWorkloadPredictions.mat', model_response=predictedBedfordAll)
+fn = paste("type",type, "model_wl_predictions.mat",sep = '_')
+writeMat(fn, model_response=predictedBedfordAll)
 
 resp_og = resp;
 
@@ -80,14 +89,14 @@ predictedBedfordAll <- c()
 for (out in c(1:180)){
   bigXnew <- predictors
   #remove observation being left out
-  bigXnew <- bigXnew[-out,1:22]
+  bigXnew <- bigXnew[-out,1:size]
   resp <- bigYold
   #remove true Bedford rating being left out
   resp <- resp[-out]
   #refit coefficients using existing formula
   newMod <- clm(finalOrdModel$formula,data = bigXnew)
   #predict left out observation
-  prediction <-predict(newMod,predictors[out,1:22])
+  prediction <-predict(newMod,predictors[out,1:size])
   predictedBedford <- which.max(prediction$fit)
   #record in vector
   predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
@@ -120,11 +129,13 @@ for (out in c(1:180)){
 
 
 #Do some ploting
-plot(bigYold, predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 3\n Leave One Trial Out Cross Validation',
-     xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red')
+plot(bigYold, predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 1\n Leave One Trial Out Cross Validation',
+     xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red', ylim = c(1,10),
+     xlim = c(1,10))
 abline(lm(predictedBedfordAll~bigYold), col='red')
 abline(0,1, col='blue',)
 axis(side=1, at=c(1,2,3,4,5,6,7,8,9,10))
+
 axis(side=2, at=c(1,2,3,4,5,6,7,8,9,10))
 legend('topleft', legend = c('Predicted Trial Value','Line of Best Fit','Ideal Relationship'), 
        col=c('red','red','blue'), lty=1:2)
@@ -141,14 +152,14 @@ for (out in seq(1,180,12)){
   start = out;
   stop = out + 11;
   
-  bigXnew <- bigXnew[-c(start:stop),1:22]
+  bigXnew <- bigXnew[-c(start:stop),1:size]
   resp <- bigYold
   #remove true Bedford rating being left out
   resp <- resp[-c(start:stop)]
   #refit coefficients using existing formula
   newMod <- clm(finalOrdModel$formula,data = bigXnew)
   #predict left out observation
-  prediction <-predict(newMod,predictors[c(start:stop),1:22])
+  prediction <-predict(newMod,predictors[c(start:stop),1:size])
   predictedBedford <- c();
   for (out2 in c(1:12))
     predictedBedford[out2] <- which.max(prediction$fit[out2,])
@@ -158,14 +169,23 @@ for (out in seq(1,180,12)){
 }
 
 #Do some ploting
-plot(bigYold, LOOCV_B_predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 3\n Leave One Subject Out Cross Validation',
+plot(bigYold, LOOCV_B_predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 1\n Leave One Subject Out Cross Validation',
      xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red')
 abline(lm(LOOCV_B_predictedBedfordAll~bigYold), col='red')
 abline(0,1, col='blue',)
 axis(side=1, at=c(1,2,3,4,5,6,7,8,9,10))
 axis(side=2, at=c(1,2,3,4,5,6,7,8,9,10))
+
 legend('topleft', legend = c('Predicted Trial Value','Line of Best Fit','Ideal Relationship'), 
        col=c('red','red','blue'), lty=1:2)
+ylim(1,10)
+xlim(1,10)
 
+fn2 = paste("type",type, "_LOOCV_B_predictions.mat",sep = '_')
+writeMat(fn2, LOOCV_B=LOOCV_B_predictedBedfordAll)
 
-writeMat('type_3_workload_loocvB.mat', LOOCV_B=LOOCV_B_predictedBedfordAll)
+}
+
+make_models("1", 19)
+#make_models("2", 21)
+#make_models("3", 22)
