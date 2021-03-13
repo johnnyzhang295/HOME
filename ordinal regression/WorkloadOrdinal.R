@@ -2,6 +2,7 @@ library(R.matlab)
 library(ordinal)
 library(MASS)
 library(boot)
+library(plotly)
 library(rcompanion)
 #the directory where your .mat file is
 setwd("~/Zhang/HOME/ordinal regression") 
@@ -37,22 +38,38 @@ resp <- factor(matlabData$bigY[1:180], ordered=TRUE)
 #start with model including all terms and 2nd order interactions
 ordModel <- clm(resp ~ ., data = predictors)
 
-#finalOrdModel <- clm(resp ~ HR + V2 + V3 + V4 + V6 + V7 + V8 + V9 + V10 + V12 + V13 + V14 + V16 + V17 + V18 + V19 + V20 + V21 + V22 + V3:V9 + V16:V21 + V12:V19 + V10:V14 + V18:V22 + V19:V20 + V12:V16, data=predictors)
-#stepwise fit according to AIC
-finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=20)
+finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + 
+                       MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + 
+                       MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + 
+                       MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + 
+                       BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + 
+                       Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + 
+                       HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + 
+                       MedianNN:MeanPupilDiameter, data=predictors)
+  
+  #stepwise fit according to AIC
+#finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=20)
 #show resulting model terms
 summary(finalOrdModel)
 #Find pseudo-Rsquareds
 nagelkerke(finalOrdModel, null = NULL, restrictNobs = FALSE)
-#Calculate probabilities for Bedford ratings on each trial
-a<-predict(finalOrdModel,predictors)
-#Plot trial 15 probabilities
-barplot(a$fit[15,1:10])
-#Compare to actual trial 15 Bedford rating
-matlabData$bigY[15]
-#Save .mat for Matlab use
-writeMat('test.mat',a = a)
 
+
+#initialize 
+predictedBedfordAll <- c()
+
+for (out in c(1:180)){
+  
+  #predict left out observation
+  prediction <-predict(finalOrdModel,predictors[out,1:22])
+  predictedBedford <- which.max(prediction$fit)
+  #record in vector
+  predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
+}
+
+writeMat('type_3_ModelWorkloadPredictions.mat', model_response=predictedBedfordAll)
+
+resp_og = resp;
 
 #true Bedford ratings
 bigYold<-resp
@@ -70,7 +87,7 @@ for (out in c(1:180)){
   #refit coefficients using existing formula
   newMod <- clm(finalOrdModel$formula,data = bigXnew)
   #predict left out observation
-  prediction <-predict(finalOrdModel,predictors[out,1:22])
+  prediction <-predict(newMod,predictors[out,1:22])
   predictedBedford <- which.max(prediction$fit)
   #record in vector
   predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
@@ -111,3 +128,44 @@ axis(side=1, at=c(1,2,3,4,5,6,7,8,9,10))
 axis(side=2, at=c(1,2,3,4,5,6,7,8,9,10))
 legend('topleft', legend = c('Predicted Trial Value','Line of Best Fit','Ideal Relationship'), 
        col=c('red','red','blue'), lty=1:2)
+
+
+
+bigYold<-resp_og;
+#initialize
+LOOCV_B_predictedBedfordAll <- c()
+
+for (out in seq(1,180,12)){
+  bigXnew <- predictors
+  #remove observation being left out
+  start = out;
+  stop = out + 11;
+  
+  bigXnew <- bigXnew[-c(start:stop),1:22]
+  resp <- bigYold
+  #remove true Bedford rating being left out
+  resp <- resp[-c(start:stop)]
+  #refit coefficients using existing formula
+  newMod <- clm(finalOrdModel$formula,data = bigXnew)
+  #predict left out observation
+  prediction <-predict(newMod,predictors[c(start:stop),1:22])
+  predictedBedford <- c();
+  for (out2 in c(1:12))
+    predictedBedford[out2] <- which.max(prediction$fit[out2,])
+  
+  #record in vector
+  LOOCV_B_predictedBedfordAll <- c(LOOCV_B_predictedBedfordAll,predictedBedford)
+}
+
+#Do some ploting
+plot(bigYold, LOOCV_B_predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 3\n Leave One Subject Out Cross Validation',
+     xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red')
+abline(lm(LOOCV_B_predictedBedfordAll~bigYold), col='red')
+abline(0,1, col='blue',)
+axis(side=1, at=c(1,2,3,4,5,6,7,8,9,10))
+axis(side=2, at=c(1,2,3,4,5,6,7,8,9,10))
+legend('topleft', legend = c('Predicted Trial Value','Line of Best Fit','Ideal Relationship'), 
+       col=c('red','red','blue'), lty=1:2)
+
+
+writeMat('type_3_workload_loocvB.mat', LOOCV_B=LOOCV_B_predictedBedfordAll)
