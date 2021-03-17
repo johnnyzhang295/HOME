@@ -1,4 +1,4 @@
-%% Setup 
+% Setup 
 clear all;
 clear workspace;
 global ColOrd;
@@ -19,21 +19,22 @@ data_without_demographics.Sex = [];
 data_without_TL = data_without_demographics;
 data_without_TL.Taskload = [];
 
-%% Type 1 Model
+% Type 1 Model
 formula_1 = ...
 "SART ~ 1 + ECG_Rate_Mean*HRV_MeanNN + ECG_Rate_Mean*RSP_Amplitude + HRV_RMSSD:HRV_pNN50 + HRV_RMSSD*RSP_Rate + HRV_RMSSD*MeanPupilDiameter + HRV_MeanNN:HRV_pNN50 + HRV_SDNN:HRV_TINN + HRV_SDNN:RSP_Rate + HRV_pNN50:MeanPupilDiameter";
 %mdl_1 = stepwiseglm(data_without_TL, formula_1, 'Criterion', 'aic','Verbose',2);
 
 mdl_1 = fitglm(data_without_TL, formula_1);
- type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
+type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
 pie_1 = pieChartModel(mdl_1.CoefficientNames);
 [type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
 [type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
 type_1_f4 = plotRes(mdl_1);
 
-%% Type 2 Model
+% Type 2 Model
 formula_2 = ...
 'SART~ 1 + ECG_Rate_Mean + MeanPupilDiameter -HRV_pNN50 -Taskload + HRV_MeanNN*HRV_SDNN + HRV_MeanNN*HRV_pNN50 + HRV_MeanNN*TrialOrder + HRV_SDNN*HRV_pNN50 + HRV_SDNN*RSP_Amplitude + HRV_CVNN*RSP_Amplitude + HRV_CVNN*TrialOrder + HRV_TINN:Taskload + RSP_Rate:MeanPupilDiameter + RSP_Rate:Taskload'
+
 %mdl_2 = stepwiseglm(data_without_demographics, formula_2, 'Criterion','aic');
 mdl_2 = fitglm(data_without_demographics, formula_2);
 type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
@@ -41,7 +42,7 @@ pie_2 = pieChartModel(mdl_2.CoefficientNames);
 [type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
 [type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
 type_2_f4 = plotRes(mdl_2);
-%% Type 3 Model
+% Type 3 Model
 formula_3 = ...
     'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
 formula_3 = ...
@@ -57,7 +58,7 @@ type_3_f4 = plotRes(mdl_3);
 
 %% Save models
 %Save Figs
-save = 1;
+save =1;
 if (save == 1)
     savePlots(type_1_f1, 1, '0');
     savePlots(type_1_f2, 1, 'B');
@@ -90,9 +91,9 @@ function fig = plotRes(mdl)
     subplot(1,3,1)
     plotResiduals(mdl);
     subplot(1,3,2)
-    plotResiduals(mdl,'probability')
+    plotResiduals(mdl,'probability','ResidualType','Pearson')
     subplot(1,3,3)
-    plotResiduals(mdl,'fitted')
+    plotResiduals(mdl,'fitted','ResidualType','Pearson')
     
     sgtitle('Residual Analysis')
 end
@@ -136,8 +137,13 @@ function fig = pieChartModel(coeffs)
     pie_data = nonzeros(pie_data)';
     
     
-    pie(pie_data, labels);
-    title('Feature Breakdown By Source');
+    p = pie(pie_data, labels);
+    
+    for (i = 2:2:length(p))
+        p(i).FontSize = 30;
+        
+    end
+    title('Feature Breakdown By Source', 'FontSize', 30);
     
     
 end
@@ -174,21 +180,25 @@ function fig = plotMdl(mdl, data, type)
         
         plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
         
-        legend("Ideal Relationship");
+        if (j == 1)
+            legend("Ideal Relationship");
+        end
         %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
         ylim([0,46])
         xlim([0,46])
         ylabel('Model Response');
         xlabel('SART Score');
-        title(string(j));
+        title(strcat('Subject ', {' '},string(j)));
         j = j+1;
         grid on;
+        ax = gca;
+        ax.FontSize = 12;
 
     end
         
     formula="";
     topTitle = formula;
-    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
+    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.Rsquared.Adjusted));
 
     suptitle(topTitle);
 
@@ -202,6 +212,7 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     q_sqs = [];
     numerators = [];
     denoms = [];
+    rmse = 0;
     for j = (1:15)
         if (j < 10)
             LOO_id = strcat('20',string(j));
@@ -226,20 +237,23 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         xlabel('SART Score');
         
         plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
-        legend("Predicted Subject", "Ideal Relationship");
-        
-        title(string(j));
+        if (j== 1)
+            legend("Predicted Subject", "Ideal Relationship");
+        end
+        title(strcat('Subject', {' '}, string(j)));
         grid on;
 
         [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,mdl);
+        
+        rmse = rmse + sqrt(1/12*(sum((y - LOO_data.SART).^2)));
     end
     mdls = mdls';
     q_sqs = q_sqs';
-
+    display('loocv B=' + string(rmse/15) )
     
     
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type B For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLeave One Subject Out CV For SA \nQ^{2} = %4.2f ',overall_q_sq));
 
     suptitle(topTitle);
 end
@@ -260,6 +274,7 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
         figure(fig);
         subplot(1,3, subplot_position);
     end
+    rmse = 0;
     for j = (1:180)
         %LOO_data should include the workload/sa value
         LOO_data = data(j,:);
@@ -288,21 +303,26 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
         %title(string(j));
         grid on;
 
+        rmse = rmse + sqrt(1/1*(sum((y - LOO_data.SART).^2)));
         [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,mdl);
+        ax = gca;
+        ax.FontSize = 14;
     end
-
+    display('loocv C=' + string(rmse/180) );
     p = polyfit(all_xs,all_ys,1);
     yfit = polyval(p,(0:46));
     plot((0:46),yfit,'-','Color','r');
     plot([0,46],[0,46],'-','Color','b');
         
-    legend('Predicted Trial Value', 'Line of Best Fit', 'Ideal Relationship');
+    if (subplot_position == 1)
+        legend({'Predicted Trial Value', 'Line of Best Fit', 'Ideal Relationship'}, 'FontSize', 14);
+    end
     mdls = mdls';
     q_sqs = q_sqs';
 
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
 
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLOOCV Type C For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLeave One Trial Out CV For SA \nQ^{2} = %4.2f ',overall_q_sq));
 
     title(topTitle);
     
