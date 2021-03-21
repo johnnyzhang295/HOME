@@ -4,6 +4,7 @@ library(MASS)
 library(boot)
 library(plotly)
 library(rcompanion)
+library(sure)
 #the directory where your .mat file is
 setwd("~/Zhang/HOME/ordinal regression") 
 
@@ -12,10 +13,16 @@ make_models <- function(type, size) {
   
   # a .mat file with 2 matrices: one with predictors and one with Bedford scores
   matlabData <- (readMat("workloadData.mat")) 
+  sex_id <- readMat('sex_id.mat')
+  sex_id <- sex_id$add;
   
+  sex_id[,1] <- factor(sex_id[,1])
+  
+  sex_id[,2] <- factor(sex_id[,2])
   
 #matlabData$bigX is your matlab matrix containing predictor variables
 predictors <- as.data.frame(matlabData$bigX[1:180,]) 
+  predictors <-  cbind(predictors, sex_id)
 colnames(predictors)[1] = 'HR';
 colnames(predictors)[2] = 'RMSSD';
 colnames(predictors)[3] = 'MeanNN';
@@ -39,28 +46,59 @@ colnames(predictors)[20] = 'Age';
 colnames(predictors)[21] = 'Taskload';
 colnames(predictors)[22] = 'TrialOrder';
 
+colnames(predictors)[23] = 'Sex';
+colnames(predictors)[24] = 'ID';
+
+
 #predictors = predictors[1:180, -20]; # for model type 2
-predictors = predictors[1:180, 1:size]; # for model types 1,3
+#predictors = predictors[1:180, 1:size]; # for model types 1,3
 #matlabData$bigY is your matlab matrix containing Bedford scores
 resp <- factor(matlabData$bigY[1:180], ordered=TRUE)
 #start with model including all terms and 2nd order interactions
 ordModel <- clm(resp ~ ., data = predictors)
 
-# finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + 
-#                        MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + 
-#                        MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + 
-#                        MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + 
-#                        BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + 
-#                        Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + 
-#                        HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + 
-#                        MedianNN:MeanPupilDiameter, data=predictors)
+if (type == "3"){
+
+finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN +
+                       MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate +
+                       MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder +
+                       MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder +
+                       BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate +
+                       Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age +
+                       HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter +
+                       MedianNN:MeanPupilDiameter, data=predictors)
+} else if (type == "2"){
+  
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + 
+                         MadNN:BlinkCount + MeanPupilDiameter:TrialOrder + RSP_Amplitude:Taskload + MeanNN:MadNN, data=predictors)
+
+} else if (type == "1"){
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + MeanPupilDiameter + BlinkCount + CVNN:TINN + pNN50:RSP_Amplitude + pNN50:HTI + IQRNN:HTI + MeanPupilDiameter:BlinkCount + HR:HTI + HR:CVNN + MeanNN:pNN50 + HR:pNN50
+                       , data=predictors)
+
+}  else if (type == "4")
+{
+  
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter  + Taskload + TrialOrder + ID + MeanNN:MadNN + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + MCVNN:TINN + MeanPupilDiameter:TrialOrder + RSP_Amplitude:RSP_Rate + HTI:Taskload + RSP_Amplitude:MeanPupilDiameter + RSP_Rate:ID
+, data=predictors)
+} else if (type == "5"){
+  
+  finalOrdModel <- clm(resp ~ RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + 
+    MCVNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + 
+    MeanPupilDiameter + Age + Taskload + TrialOrder + Sex + ID + 
+    MeanNN:MadNN + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + 
+    MCVNN:TINN + MeanPupilDiameter:TrialOrder + RSP_Amplitude:RSP_Rate + 
+    HTI:Taskload + RSP_Amplitude:MeanPupilDiameter + RSP_Rate:ID + 
+    TINN:Age + RSP_Rate:Taskload, data = predictors)
+}
+
   
   #stepwise fit according to AIC
-finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=4)
+#finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=4)
 #show resulting model terms
 summary(finalOrdModel)
 #Find pseudo-Rsquareds
-nagelkerke(finalOrdModel, null = NULL, restrictNobs = FALSE)
+print(nagelkerke(finalOrdModel, null = NULL, restrictNobs = FALSE))
 
 
 #initialize 
@@ -79,6 +117,8 @@ fn = paste("type",type, "model_wl_predictions.mat",sep = '_')
 writeMat(fn, model_response=predictedBedfordAll)
 
 resp_og = resp;
+
+residuals = resp_og - predictedBedfordAll
 
 #true Bedford ratings
 bigYold<-resp
@@ -128,8 +168,15 @@ for (out in c(1:180)){
 }
 
 
+
+fn2 = paste("type",type, "_LOOCV_C_predictions.mat",sep = '_')
+writeMat(fn2, LOOCV_C=predictedBedfordAll)
+
+
 #Do some ploting
-plot(bigYold, predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 1\n Leave One Trial Out Cross Validation',
+
+title = paste('Workload Ordinal Regression\nModel Type ', type, '\n Leave One Trial Out Cross Validation')
+plot(bigYold, predictedBedfordAll, main=title,
      xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red', ylim = c(1,10),
      xlim = c(1,10))
 abline(lm(predictedBedfordAll~bigYold), col='red')
@@ -168,8 +215,36 @@ for (out in seq(1,180,12)){
   LOOCV_B_predictedBedfordAll <- c(LOOCV_B_predictedBedfordAll,predictedBedford)
 }
 
+#initialize accuracy counters
+B_ACC0 <- 0
+B_ACC1 <- 0
+B_ACC2 <- 0
+#convert to integer for comparisons
+bigYold <- as.integer(bigYold)
+
+#calculate accuracy metrics
+for (out in c(1:180)){
+  if(LOOCV_B_predictedBedfordAll[out]==bigYold[out]){
+    B_ACC0 <- B_ACC0+1 
+  }
+}
+for (out in c(1:180)){
+  if(LOOCV_B_predictedBedfordAll[out]==bigYold[out] | abs(LOOCV_B_predictedBedfordAll[out]-bigYold[out])==1){
+    B_ACC1 <- B_ACC1+1 
+  }
+}
+for (out in c(1:180)){
+  if(LOOCV_B_predictedBedfordAll[out]==bigYold[out] | abs(LOOCV_B_predictedBedfordAll[out]-bigYold[out])==2|
+     abs(LOOCV_B_predictedBedfordAll[out]-bigYold[out])==1){
+    B_ACC2 <- B_ACC2+1 
+  }
+}
+B_rmse = 1/180 * sum((LOOCV_B_predictedBedfordAll - bigYold)^2)
+print(B_rmse)
 #Do some ploting
-plot(bigYold, LOOCV_B_predictedBedfordAll, main='Workload Ordinal Regression\nModel Type 1\n Leave One Subject Out Cross Validation',
+
+title = paste('Workload Ordinal Regression\nModel Type ', type, '\n Leave One Subject Out Cross Validation')
+plot(bigYold, LOOCV_B_predictedBedfordAll, main=title,
      xlab='Subject Workload Score', ylab='Predicted Workload Response', col='red')
 abline(lm(LOOCV_B_predictedBedfordAll~bigYold), col='red')
 abline(0,1, col='blue',)
@@ -186,6 +261,8 @@ writeMat(fn2, LOOCV_B=LOOCV_B_predictedBedfordAll)
 
 }
 
-make_models("1", 19)
-#make_models("2", 21)
+#make_models("5", 24)
+make_models("4", 24)
+#make_models("1", 22)
+#make_models("2", 22)
 #make_models("3", 22)
