@@ -49,9 +49,10 @@ colnames(predictors)[22] = 'TrialOrder';
 colnames(predictors)[23] = 'Sex';
 colnames(predictors)[24] = 'ID';
 
+predictors = predictors[1:180, -23];
+predictors = predictors[1:180, -20]; # for model type 2
 
-#predictors = predictors[1:180, -20]; # for model type 2
-#predictors = predictors[1:180, 1:size]; # for model types 1,3
+#predictors = predictors[1:180, ,]; # for model types 1,3
 #matlabData$bigY is your matlab matrix containing Bedford scores
 resp <- factor(matlabData$bigY[1:180], ordered=TRUE)
 #start with model including all terms and 2nd order interactions
@@ -83,13 +84,8 @@ finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN 
 , data=predictors)
 } else if (type == "5"){
   
-  finalOrdModel <- clm(resp ~ RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + 
-    MCVNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + 
-    MeanPupilDiameter + Age + Taskload + TrialOrder + Sex + ID + 
-    MeanNN:MadNN + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + 
-    MCVNN:TINN + MeanPupilDiameter:TrialOrder + RSP_Amplitude:RSP_Rate + 
-    HTI:Taskload + RSP_Amplitude:MeanPupilDiameter + RSP_Rate:ID + 
-    TINN:Age + RSP_Rate:Taskload, data = predictors)
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + ID + SDSD:BlinkCount + MeanPupilDiameter:TrialOrder + pNN20:ID + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + MadNN:pNN50 + MeanNN:MeanPupilDiameter + MadNN:ID + pNN20:MeanPupilDiameter + IQRNN:pNN20 + SDNN:MCVNN + HR:IQRNN + MadNN:pNN20
+                       ,data=predictors)
 }
 
   
@@ -107,7 +103,7 @@ predictedBedfordAll <- c()
 for (out in c(1:180)){
   
   #predict left out observation
-  prediction <-predict(finalOrdModel,predictors[out,1:size])
+  prediction <-predict(finalOrdModel,predictors[out,])
   predictedBedford <- which.max(prediction$fit)
   #record in vector
   predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
@@ -129,14 +125,14 @@ predictedBedfordAll <- c()
 for (out in c(1:180)){
   bigXnew <- predictors
   #remove observation being left out
-  bigXnew <- bigXnew[-out,1:size]
+  bigXnew <- bigXnew[-out,]
   resp <- bigYold
   #remove true Bedford rating being left out
   resp <- resp[-out]
   #refit coefficients using existing formula
   newMod <- clm(finalOrdModel$formula,data = bigXnew)
   #predict left out observation
-  prediction <-predict(newMod,predictors[out,1:size])
+  prediction <-predict(newMod,predictors[out,])
   predictedBedford <- which.max(prediction$fit)
   #record in vector
   predictedBedfordAll <- c(predictedBedfordAll,predictedBedford)
@@ -199,14 +195,14 @@ for (out in seq(1,180,12)){
   start = out;
   stop = out + 11;
   
-  bigXnew <- bigXnew[-c(start:stop),1:size]
+  bigXnew <- bigXnew[-c(start:stop),]
   resp <- bigYold
   #remove true Bedford rating being left out
   resp <- resp[-c(start:stop)]
   #refit coefficients using existing formula
   newMod <- clm(finalOrdModel$formula,data = bigXnew)
   #predict left out observation
-  prediction <-predict(newMod,predictors[c(start:stop),1:size])
+  prediction <-predict(newMod,predictors[c(start:stop),])
   predictedBedford <- c();
   for (out2 in c(1:12))
     predictedBedford[out2] <- which.max(prediction$fit[out2,])
@@ -261,8 +257,8 @@ writeMat(fn2, LOOCV_B=LOOCV_B_predictedBedfordAll)
 
 }
 
-#make_models("5", 24)
-make_models("4", 24)
+make_models("5", 24)
+#make_models("4", 24)
 #make_models("1", 22)
 #make_models("2", 22)
 #make_models("3", 22)
