@@ -16,6 +16,9 @@ make_models <- function(type, size) {
   sex_id <- readMat('sex_id.mat')
   sex_id <- sex_id$add;
   
+  x = factor(sex_id[,2]);
+  y =  factor(matlabData$bigY[1:180], ordered=TRUE)
+  
   sex_id[,1] <- factor(sex_id[,1])
   
   sex_id[,2] <- factor(sex_id[,2])
@@ -47,11 +50,16 @@ colnames(predictors)[21] = 'Taskload';
 colnames(predictors)[22] = 'TrialOrder';
 
 colnames(predictors)[23] = 'Sex';
+predictors[,23] = factor(predictors[,23]);
+
 colnames(predictors)[24] = 'ID';
 
-predictors = predictors[1:180, -23];
-predictors = predictors[1:180, -20]; # for model type 2
+predictors = predictors[1:180, -23]; # for model type 4/5
+predictors = predictors[1:180, -20]; # for model type 2/4/5
 
+predictors[,22] = factor(predictors[,22])
+
+predictors <<- as.data.frame(predictors)
 #predictors = predictors[1:180, ,]; # for model types 1,3
 #matlabData$bigY is your matlab matrix containing Bedford scores
 resp <- factor(matlabData$bigY[1:180], ordered=TRUE)
@@ -79,20 +87,37 @@ finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN 
 
 }  else if (type == "4")
 {
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN +
+                         MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate +
+                         MeanPupilDiameter + BlinkCount  + Taskload + TrialOrder +
+                         MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder +
+                        pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate +
+                          pNN20:MeanPupilDiameter + 
+                          CVNN:pNN20 + MeanNN:MeanPupilDiameter + ID + 
+                         MedianNN:MeanPupilDiameter, data=predictors)
+
+  #finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("backward"), steps=10)
   
-  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter  + Taskload + TrialOrder + ID + MeanNN:MadNN + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + MCVNN:TINN + MeanPupilDiameter:TrialOrder + RSP_Amplitude:RSP_Rate + HTI:Taskload + RSP_Amplitude:MeanPupilDiameter + RSP_Rate:ID
-, data=predictors)
 } else if (type == "5"){
   
-  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + ID + SDSD:BlinkCount + MeanPupilDiameter:TrialOrder + pNN20:ID + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + MadNN:pNN50 + MeanNN:MeanPupilDiameter + MadNN:ID + pNN20:MeanPupilDiameter + IQRNN:pNN20 + SDNN:MCVNN + HR:IQRNN + MadNN:pNN20
-                       ,data=predictors)
+  
+  finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + MedianNN + MadNN + 
+                         MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + 
+                         RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + 
+                         ID + Taskload:ID + MeanPupilDiameter:TrialOrder + MadNN:pNN50 + 
+                         IQRNN:pNN20 + pNN20:MeanPupilDiameter + MadNN:ID + RSP_Amplitude:RSP_Rate + 
+                         SDNN:BlinkCount + MCVNN:HTI + MadNN:pNN20 + MeanPupilDiameter:BlinkCount + 
+                         HTI:RSP_Rate + HTI:TrialOrder, data=predictors)
+  
+  #finalOrdModel <- clm(resp ~ HR + RMSSD + MeanNN + SDNN + SDSD + CVNN + CVSD + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + ID + SDSD:BlinkCount + MeanPupilDiameter:TrialOrder + pNN20:ID + RSP_Amplitude:Taskload + pNN50:RSP_Amplitude + MadNN:pNN50 + MeanNN:MeanPupilDiameter + MadNN:ID + pNN20:MeanPupilDiameter + IQRNN:pNN20 + SDNN:MCVNN + HR:IQRNN + MadNN:pNN20
+  #                     ,data=predictors)
 }
 
   
-  #stepwise fit according to AIC
+#stepwise fit according to AIC
 #finalOrdModel <- stepAIC(ordModel, scope=list(upper=~.*., lower=~1),direction = c("both"), steps=4)
 #show resulting model terms
-summary(finalOrdModel)
+print(summary(finalOrdModel))
 #Find pseudo-Rsquareds
 print(nagelkerke(finalOrdModel, null = NULL, restrictNobs = FALSE))
 
@@ -183,7 +208,7 @@ axis(side=2, at=c(1,2,3,4,5,6,7,8,9,10))
 legend('topleft', legend = c('Predicted Trial Value','Line of Best Fit','Ideal Relationship'), 
        col=c('red','red','blue'), lty=1:2)
 
-
+if (type != "4" || "5"){
 
 bigYold<-resp_og;
 #initialize
@@ -254,11 +279,12 @@ xlim(1,10)
 
 fn2 = paste("type",type, "_LOOCV_B_predictions.mat",sep = '_')
 writeMat(fn2, LOOCV_B=LOOCV_B_predictedBedfordAll)
+}
 
 }
 
-make_models("5", 24)
-#make_models("4", 24)
+#make_models("5", 24)
+make_models("4", 24)
 #make_models("1", 22)
 #make_models("2", 22)
 #make_models("3", 22)
