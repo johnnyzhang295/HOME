@@ -25,11 +25,8 @@ formula_1 = ...
 %mdl_1 = stepwiseglm(data_without_TL, formula_1, 'Criterion', 'aic','Verbose',2);
 
 mdl_1 = fitglm(data_without_TL, formula_1);
-type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
-pie_1 = pieChartModel(mdl_1.CoefficientNames);
-[type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
-%[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
-type_1_f4 = plotRes(mdl_1);
+[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
+
 
 % Type 2 Model
 formula_2 = ...
@@ -37,11 +34,8 @@ formula_2 = ...
 
 %mdl_2 = stepwiseglm(data_without_demographics, formula_2, 'Criterion','aic');
 mdl_2 = fitglm(data_without_demographics, formula_2);
-type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
-pie_2 = pieChartModel(mdl_2.CoefficientNames);
-[type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
-%[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
-type_2_f4 = plotRes(mdl_2);
+[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
+
 % Type 3 Model
 formula_3 = ...
     'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
@@ -50,37 +44,14 @@ formula_3 = ...
 
 %mdl_3 = stepwiseglm(data_without_ID);
 mdl_3 = fitglm(data_without_ID,formula_3);
-type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
-pie_3 = pieChartModel(mdl_3.CoefficientNames);
-[type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
-%[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3, type_1_f3, 3);
-type_3_f4 = plotRes(mdl_3);
+[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3, type_1_f3, 3);
+
 
 %% Save models
 %Save Figs
 save =1;
 if (save == 1)
-    savePlots(type_1_f1, 1, '0');
-    savePlots(type_1_f2, 1, 'B');
-    %savePlots(type_1_f3, 1, 'C');
-    savePlots(pie_1, 1, 'p')
-    savePlots(type_1_f4, 1, 'R');
-
-    savePlots(type_2_f1, 2, '0');
-    savePlots(type_2_f2, 2, 'B');
-    savePlots(pie_2, 2, 'p')
-    savePlots(type_2_f4, 2, 'R');
-
-    savePlots(type_3_f1, 3, '0');
-    savePlots(type_3_f2, 3, 'B');
-    savePlots(pie_3, 3, 'p')
-    savePlots(type_3_f4, 3, 'R');
-
-
-    %Save Coeffs
-    saveCoeffs(mdl_1, 1);
-    saveCoeffs(mdl_2,2);
-    saveCoeffs(mdl_3,3);
+    savePlots(type_1_f3, 1, 'C');
 end
 
 
@@ -192,8 +163,8 @@ function fig = plotMdl(mdl, data, type)
         j = j+1;
         grid on;
         ax = gca;
-        ax.FontSize = 14;
-        xticks([0:10:40])
+        ax.FontSize = 12;
+
     end
         
     formula="";
@@ -246,10 +217,6 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
         [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,mdl);
         
         rmse = rmse + sqrt(1/12*(sum((y - LOO_data.SART).^2)));
-        
-        ax = gca;
-        ax.FontSize = 14;
-        xticks([0:10:40]);
     end
     mdls = mdls';
     q_sqs = q_sqs';
@@ -257,7 +224,7 @@ function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     
     
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLeave One Subject Out CV For SA'));
+    topTitle =strcat('Type',{' '},string(type), sprintf('\nLeave One Subject Out CV For SA \nQ^{2} = %4.2f ',overall_q_sq));
 
     suptitle(topTitle);
 end
@@ -273,10 +240,10 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
     
     if (fig == "")
         fig = figure('units','normalized','outerposition',[0 0 1 1]);
-        subplot(1,3,subplot_position)
+        subplot(2,3,subplot_position)
     else
         figure(fig);
-        subplot(1,3, subplot_position);
+        subplot(2,3, subplot_position);
     end
     rmse = 0;
     for j = (1:180)
@@ -300,37 +267,43 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
             plot(LOO_data.SART, y,'o','Color','r');
         end
         
-        ylim([0,46])
-        xlim([0,46])
-        ylabel('Predicted SA Response');
-        xlabel('Subject SART Score');
         %title(string(j));
-        grid on;
+     
 
         rmse = rmse + sqrt(1/1*(sum((y - LOO_data.SART).^2)));
         [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,mdl);
-        ax = gca;
-        ax.FontSize = 14;
+
     end
+        grid on;       ax = gca;
+        grid minor;
+        ax.FontSize = 30;
     display('loocv C=' + string(rmse/180) );
     p = polyfit(all_xs,all_ys,1);
     yfit = polyval(p,(0:46));
     plot((0:46),yfit,'-','Color','r');
     plot([0,46],[0,46],'-','Color','b');
-        
+        ylim([10,40])
+        xlim([10,40]) 
     if (subplot_position == 1)
         legend({'Predicted Trial Value', 'Line of Best Fit', 'Ideal Relationship'}, 'FontSize', 14);
+        
+       
+        ylabel('Predicted SA Response');
+        %xlabel('Subject SART Score');
+    end
+    if (subplot_position ==2 )
+        xlabel('Subject SART Score');
     end
     mdls = mdls';
     q_sqs = q_sqs';
 
     overall_q_sq = 1 - (sum(numerators) / sum(denoms));
 
-    topTitle =strcat('Type',{' '},string(type), sprintf('\nLeave One Trial Out CV For SA \nQ^{2} = %4.2f ',overall_q_sq));
+    topTitle =strcat('Type',{' '}, string(type));
 
     title(topTitle);
     
-    sgtitle("Exhaustive Leave One Trial Out Cross Validation");
+    sgtitle("Exhaustive Leave One Trial Out Cross Validation", 'FontSize', 30);
     
 end
 
