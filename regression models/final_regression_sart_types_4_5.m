@@ -29,10 +29,10 @@ formula_D = ...
 
 %mdl_4 = stepwiseglm(data,formula_4);
 mdl_4 = fitglm(data,formula_4 );
-%type_4_f1 = plotMdl(mdl_4,data, 4);
+type_4_f1 = plotMdl(mdl_4,data, 4);
 %pie_4 = pieChartModel(mdl_4.CoefficientNames);
 % We cannot do LOOCV_B for Model types 4 and 5
-[type_4_f2, type_4_q_sq_B] = LOOCV_B(mdl_4,data, 4, formula_4)
+%[type_4_f2, type_4_q_sq_B] = LOOCV_B(mdl_4,data, 4, formula_4)
 %[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4, "", 1);
 %[type_4_f5, type_4_q_sq_D] = LOOCV_D(data, 4, formula_4, '+ID') %You need to feed a model 3 formula into LOOCV D
 % type_4_f4 = plotRes(mdl_4);
@@ -42,8 +42,8 @@ formula_5 = ...
     'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
 %mdl_5 = stepwiseglm(data);
  mdl_5 = fitglm(data,formula_5 );
- [type_5_f2, type_5_q_sq_B] = LOOCV_B(mdl_5,data, 5, formula_5)
-% %type_5_f1 = plotMdl(mdl_5,data, 5);
+ %[type_5_f2, type_5_q_sq_B] = LOOCV_B(mdl_5,data, 5, formula_5)
+type_5_f1 = plotMdl(mdl_5,data, 5);
 % %pie_5 = pieChartModel(mdl_5.CoefficientNames);
 % % We cannot do LOOCV_B for Model types 4 and 5
 % %[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
@@ -56,20 +56,20 @@ formula_5 = ...
 
 %% Save models
 %Save Figs
-save = 0;
+save = 1;
 if (save == 1)
 
     savePlots(type_4_f1, 4, '0');
-    savePlots(type_4_f3, 4, 'C');
-    savePlots(type_4_f4, 4, 'R');
-    savePlots(type_4_f5, 4, 'D');
-    savePlots(pie_4, 4, 'p')
+    %savePlots(type_4_f3, 4, 'C');
+    %savePlots(type_4_f4, 4, 'R');
+    %savePlots(type_4_f5, 4, 'D');
+    %savePlots(pie_4, 4, 'p')
 
     savePlots(type_5_f1, 5, '0');
-    savePlots(type_5_f3, 5, 'C');
-    savePlots(type_5_f4, 5, 'R');
-    savePlots(type_5_f5, 5, 'D');
-    savePlots(pie_5, 5, 'p')
+    %savePlots(type_5_f3, 5, 'C');
+    %savePlots(type_5_f4, 5, 'R');
+    %savePlots(type_5_f5, 5, 'D');
+    %savePlots(pie_5, 5, 'p')
 
     saveCoeffs(mdl_4,4);
     saveCoeffs(mdl_5,5);
@@ -225,21 +225,25 @@ function fig = plotMdl(mdl, data, type)
         
         plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
         
-        legend("Ideal Relationship");
+        if (j == 1)
+            legend("Ideal Relationship");
+        end
         %plot(sart(i:i+11),yfit,'-','Color',ColOrd(j,:),'HandleVisibility','off');
         ylim([0,46])
         xlim([0,46])
         ylabel('Model Response');
         xlabel('SART Score');
-        title(string(j));
+        title(strcat('Subject ', {' '},string(j)));
         j = j+1;
         grid on;
-
+        ax = gca;
+        ax.FontSize = 14;
+        xticks([0:10:40]);
     end
         
     formula="";
     topTitle = formula;
-    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
+    topTitle = strcat(formula,sprintf('\n'), 'Type ',{' '},string(type),sprintf(' SA Psychophysiological Regression Model Performance \nAIC = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.Rsquared.Adjusted));
 
     suptitle(topTitle);
 
