@@ -99,10 +99,26 @@ function mdl = mySARTModel(data_index,save)
         hrv213 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part213\Time Based HRV Analyses By Trial.csv');
         hrv214 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part214\Time Based HRV Analyses By Trial.csv');
         hrv215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\Time Based HRV Analyses By Trial.csv');
-        sart = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\SARTScores.txt');
+        sart = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\fakeSARTScores.txt');
         trial_order = [1 2 3 4 5 6 7 8 9 10 11 12]';
 
-
+        wl = [
+             workload(2:end,1);
+             workload(2:end,2);
+             workload(2:end,3);
+             workload(2:end,4);
+             workload(2:end,5);
+             workload(2:end,6);
+             workload(2:end,7);
+             workload(2:end,8);
+             workload(2:end,9);
+             workload(2:end,10);
+             workload(2:end,11);
+             workload(2:end,12);
+             workload(2:end,13);
+             workload(2:end,14);
+             workload(2:end,15);
+            ];
 
         tl = [
              taskload(1,:)';

@@ -25,17 +25,19 @@ for (d=(1:4))
       "+ RSP_Rate*Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex"+...
       "+ BlinkCount*Age + BlinkCount*Sex + BlinkCount*TrialOrder + Age*Sex" +...
       "+ Sex*Taskload";
+  
+    stepwise_formula = 'SART~1 + TrialOrder + HRV_MeanNN+ RSP_Rate*Taskload + RSP_Rate*TrialOrder + Sex*Taskload';
     %mdl_3 = stepwiseglm(data_without_ID);
-    mdl_3 = fitglm(data_without_ID,formula_3);
+    mdl_3 = fitglm(data_without_ID,stepwise_formula);
     type_3_f1 = plotMdl(mdl_3,data_without_ID, 3, data_label);
-    [type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
-    [type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3);
+    [type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, mdl_3.Formula); %This is not a typo! LOOCV_B needs the ID
+    [type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, mdl_3.Formula);
     pie = pieChartModel(mdl_3.CoefficientNames);
-    savePlots(pie, 3, 'p', data_label)
-    savePlots(type_3_f1, 3, '0', data_label);
-    savePlots(type_3_f2, 3, 'B',data_label);
-    savePlots(type_3_f3, 3, 'C',data_label);
-    saveCoeffs(mdl_3,3);
+    %savePlots(pie, 3, 'p', data_label)
+    %savePlots(type_3_f1, 3, '0', data_label);
+    %savePlots(type_3_f2, 3, 'B',data_label);
+    %savePlots(type_3_f3, 3, 'C',data_label);
+    %saveCoeffs(mdl_3,3);
 end
 
 
@@ -151,7 +153,7 @@ end
 
 function [fig, overall_q_sq] = LOOCV_B(mdl,data,type, formula)
     global ColOrd;
-    
+    formula = strcat(formula.ResponseName, '~', formula.LinearPredictor);
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
     mdls = {};
     q_sqs = [];

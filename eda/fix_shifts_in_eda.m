@@ -2,29 +2,31 @@
 clear all;
 clear workspace;
 
-participant = '201';
-trialno = 8;
+participant = '215';
+trialno = 10;
+threshold = 10000;
 
-load(strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',...
+data = load(strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part',...
     participant,'\eda\EDA Pilot Interval Trial ',{' '},...
     string(trialno),'.csv'));
 
-x_axis = linspace(0,50,length(EDA_Pilot_Interval_Trial_8));
-y = EDA_Pilot_Interval_Trial_8(:,2);
+x_axis = linspace(0,50,length(data));
+y = data(:,2);
 
 
-figure;
+figure('units','normalized','outerposition',[0 0 1 1]);
 hold on;
 subplot(3,1,1);
 plot(x_axis,y);
-title(strcat('Original Data Participant: ',participant,' Trial No: ',string(trialno)));
+savename = strcat('Original Data Participant: ',participant,' Trial No: ',string(trialno));
+title(savename);
 
 %% Change points + Plot
 % Find change points
 
 subplot(3,1,2);
 [changeIndices,segmentSlope,segmentIntercept] = ischange(y,'linear',...
-    'Threshold',10000);
+    'Threshold',threshold);
 
 % Display results
 hold on;
@@ -57,14 +59,18 @@ for i=(1:length(inds))
     if (length(inds) > 1)
         if (i == length(inds) && deltas(i) > 0)
             fixed_y(inds(i):end) = fixed_y(inds(i):end) + deltas(i);
-            
-        else
+        elseif (i == length(inds) && deltas(i) < 0)
+            fixed_y(inds(i):end) = fixed_y(inds(i):end) + deltas(i);
+        
+        elseif (i < length(inds))
             if (deltas(i) >0 && deltas(1) > 0)
                 fixed_y(inds(i):inds(i+1)-1) = fixed_y(inds(i):inds(i+1)-1)  + deltas(i);
             end
             if (deltas(i) <0 && deltas(1) < 0)
-                fixed_y(inds(i):inds(i+1)-1) = fixed_y(inds(i):inds(i+1)-1)  - deltas(i);
+                fixed_y(inds(i):inds(i+1)-1) = fixed_y(inds(i):inds(i+1)-1)  + deltas(i);
             end
+        
+        
         end
     else
         if (deltas(i) >0 )
@@ -80,3 +86,8 @@ plot(x_axis, fixed_y);
 
 title('Fixed Data');
 xlabel('Seconds');
+
+%% Save stuff
+fn = strcat(participant, {' '},' Trial ',{' '},string(trialno));
+save(strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\eda\filtered stage 1 plots\filtered stage 1 data\',fn,'.mat'),'fixed_y');
+saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\eda\filtered stage 1 plots\',fn,'.jpg'));

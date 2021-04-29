@@ -28,7 +28,7 @@ mdl_1 = fitglm(data_without_TL, formula_1);
 type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
 pie_1 = pieChartModel(mdl_1.CoefficientNames);
 [type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
-%[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
+[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1, "", 1);
 type_1_f4 = plotRes(mdl_1);
 
 % Type 2 Model
@@ -40,11 +40,10 @@ mdl_2 = fitglm(data_without_demographics, formula_2);
 type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
 pie_2 = pieChartModel(mdl_2.CoefficientNames);
 [type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
-%[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
+[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2, type_1_f3, 2);
 type_2_f4 = plotRes(mdl_2);
+
 % Type 3 Model
-formula_3 = ...
-    'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
 formula_3 = ...
     'SART~ 1 -TrialOrder - Taskload  + ECG_Rate_Mean*TrialOrder + HRV_MeanNN*RSP_Amplitude + RSP_Rate*Taskload + RSP_Rate*TrialOrder + Sex*Taskload'
 
@@ -53,8 +52,23 @@ mdl_3 = fitglm(data_without_ID,formula_3);
 type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
 pie_3 = pieChartModel(mdl_3.CoefficientNames);
 [type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
-%[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3, type_1_f3, 3);
+[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3, type_1_f3, 3);
 type_3_f4 = plotRes(mdl_3);
+
+formula_5 = ...
+    'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
+%mdl_5 = stepwiseglm(data);
+ mdl_5 = fitglm(data,formula_5 );
+ %[type_5_f2, type_5_q_sq_B] = LOOCV_B(mdl_5,data, 5, formula_5)
+type_5_f1 = plotMdl(mdl_5,data, 5);
+% %pie_5 = pieChartModel(mdl_5.CoefficientNames);
+% % We cannot do LOOCV_B for Model types 4 and 5
+% [type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
+% %[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
+% 
+% type_5_f4 = plotRes(mdl_5);
+
+[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, "", 1);
 
 %% Save models
 %Save Figs

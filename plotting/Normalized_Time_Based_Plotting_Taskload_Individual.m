@@ -41,7 +41,7 @@ wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
 data_index = 12;
-normalize=1; %Set normalize to 1 if you want to nomralize, 0 if you want raw
+normalize=0; %Set normalize to 1 if you want to nomralize, 0 if you want raw
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
 rmssd202 = hrv202(:,data_index);
@@ -91,7 +91,28 @@ rm_wl = [taskload(1,:) rmssd201';
     taskload(13,:) rmssd213';
     taskload(15,:) rmssd215';];
 
+ 
+tl2_count = 0;
+tl3_count = 0;
+tl4_count = 0;
+group_by_exposure = zeros([1 12]);
 
+data = rm_wl(1,1:12);
+for i=1:12
+    if (data(i) ==2)
+        tl2_count = tl2_count + 1;
+        group_by_exposure(i) = tl2_count;
+    elseif(data(i)==3)
+        tl3_count = tl3_count + 1;
+        group_by_exposure(i) = tl3_count;
+    else
+        tl4_count = tl4_count + 1;
+        group_by_exposure(i) = tl4_count;
+    end
+end
+
+
+g={1:12};
 xfit = linspace(2,4);
 pnums = ['201';'202';'203';'204';'205';'206';'208';'209';'211';'212';'213';'215'];
 for i=1:12
@@ -101,7 +122,7 @@ for i=1:12
     p = polyfit(rm_wl(i,1:12)', rm_wl(i,13:24)',1);
     yfit = polyval(p,xfit);
     plot(xfit,yfit,'HandleVisibility','off');
-    scatter(rm_wl(i,1:12),rm_wl(i,13:24),'filled','MarkerFaceColor',rand(1,3))
+    gscatter(rm_wl(i,1:12),rm_wl(i,13:24),g,'rkgb','o*',8,'on','TL');
     xlabel('Taskload Level')
     ylabel('Normalized pNN50')
     grid on;

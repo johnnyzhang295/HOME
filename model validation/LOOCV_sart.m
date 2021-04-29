@@ -7,10 +7,14 @@ load('C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\scaled centered 
 data.pNN50(isnan(data.pNN50)) = 0;
 data.Workload = [];
 %Define model formula here
-formula = 'SART ~ 1 + HR*pNN50 + SDNN*pNN50 + SDNN*SCMeanPupilDiameter + SDNN*ID + HR*Taskload+ HR:TrialOrder + Taskload:TrialOrder + ID:Taskload';
+formula = 'SART ~ 1 + HR*pNN50 + SDNN*pNN50 + SDNN*SCMeanPupilDiameter + HR*Taskload+ HR:TrialOrder + Taskload:TrialOrder';
           
 figure('units','normalized','outerposition',[0 0 1 1]);
 mdls = {};
+
+q_sqs = [];
+numerators = [];
+denoms = [];
 for j = (1:15)
     if (j < 10)
         LOO_id = strcat('20',string(j));
@@ -23,9 +27,9 @@ for j = (1:15)
 
     %Fit a generalized linear model
     mdl = fitglm(CV_data,formula);
-    mdls(j) = {mdl};
+    mdls(j) = {mdl}
     y = mdl.predict(LOO_data);
-    subplot(3,5,j);
+    subplot(3, 5,j);
     hold on;
     plot(LOO_data.SART, y,'o','Color',ColOrd(j,:));
     plot([0,46],[0,46],'-', 'Color', ColOrd(j,:));
@@ -35,6 +39,31 @@ for j = (1:15)
     xlabel('SART Score');
     title(string(j));
     grid on;
+    
+    [q_sqs(j), numerators(j), denoms(j)] = calculate_q_sq(LOO_data,CV_data,14,mdl);
 end
 
+topTitle = 'SART LOOCV Linear Regression Model';
+suptitle(topTitle);
 mdls = mdls';
+q_sqs = q_sqs';
+
+overall_q_sq = 1 - (sum(numerators) / sum(denoms));
+
+%q_sq = calculate_q_sq(LOO_data,CV_data,14,mdl);
+function [q_sq, term_1, term_2] = calculate_q_sq(LOO_data, CV_data, n, mdl)
+   
+    
+    Y = LOO_data{:, end};
+    Y_hat_miss_i = mdl.predict(LOO_data(:, 1:end -1));
+    
+    Y_bar_miss_i = mean(CV_data{:,end});
+    
+    term_1 = sum((Y - Y_hat_miss_i).^2);
+    term_2 = sum((Y - Y_bar_miss_i).^2);
+    
+    q_sq = 1 - (term_1/term_2);
+        
+        
+
+end

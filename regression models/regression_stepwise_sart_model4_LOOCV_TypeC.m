@@ -7,18 +7,18 @@ load('scaled centered normalized data.mat');
 
 data.pNN50(isnan(data.pNN50)) = 0;
 data.Workload = [];
-data_without_ID = data;
-data_without_ID.ID = [];
+data_without_demographics = data;
+data_without_demographics.ID = [];
+data_without_demographics.Age = [];
+data_without_demographics.Sex = [];
 
 %STEP ONE: Use stepwise to determine starting model
-%mdl = stepwiseglm(data_without_ID,'linear','Criterion','aic');
+%mdl = stepwiseglm(data,'linear','Criterion','aic');
 
 %STEP TWO: Extract formula from stepwise
 %Add ID Term bc this is Model 4s
-from_stepwise = strcat('SART ~ ID + 1 + TrialOrder + HR*RspRate + RMSSD*Age + RMSSD*Sex',...
-          '+ RMSSD*Taskload + SDNN*pNN50 + RspAmp*RspRate',...
-          '+ SCBlinkCount*Age + Age*Sex + Sex*Taskload-RspAmp:RspRate - Sex- 1 - HR - RMSSD - RspAmp - RspRate - HR:RspRate');
-          
+from_stepwise = 'SART ~ ID + RMSSD*Taskload + SDNN*pNN50 + HR:pNN50 + SDNN:SCMeanPupilDiameter + pNN50:SCMeanPupilDiameter';
+ 
 manual_fitting = strcat(from_stepwise);
 %STEP THREE: Add manual terms from correlation plot and evaluate
 %Use data with ID term
@@ -81,8 +81,8 @@ for j = (1:180)
     all_ys(j) = y;
     all_xs(j) = LOO_data.SART;
     hold on;
-    plot(LOO_data.SART, y,'o');
-    plot([0,46],[0,46],'-');
+    plot(LOO_data.SART, y,'o','Color','r');
+    plot([0,46],[0,46],'-','Color','b');
     ylim([0,46])
     xlim([0,46])
     ylabel('Predicted SA Response');
@@ -95,7 +95,7 @@ end
 
 p = polyfit(all_xs,all_ys,1);
 yfit = polyval(p,(0:46));
-plot((0:46),yfit,'-','HandleVisibility','off');
+plot((0:46),yfit,'-','Color','r','HandleVisibility','off');
     
 mdls = mdls';
 q_sqs = q_sqs';

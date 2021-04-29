@@ -240,10 +240,10 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
     
     if (fig == "")
         fig = figure('units','normalized','outerposition',[0 0 1 1]);
-        subplot(2,3,subplot_position)
+        subplot(1,3,subplot_position)
     else
         figure(fig);
-        subplot(2,3, subplot_position);
+        subplot(1,3, subplot_position);
     end
     rmse = 0;
     for j = (1:180)
@@ -277,6 +277,7 @@ function [fig, overall_q_sq] = LOOCV_C(mdl, data, type, formula, fig, subplot_po
         grid on;       ax = gca;
         grid minor;
         ax.FontSize = 30;
+        axis equal;
     display('loocv C=' + string(rmse/180) );
     p = polyfit(all_xs,all_ys,1);
     yfit = polyval(p,(0:46));

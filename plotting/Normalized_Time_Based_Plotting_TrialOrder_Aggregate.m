@@ -39,7 +39,7 @@ wl212= workload(2:end,12);
 wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
-data_index = 2;
+data_index = 1;
 normalize=1; %Set normalize to 1 if you want to nomralize, 0 if you want raw
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
@@ -77,6 +77,7 @@ if (normalize==1)
    
 end
 
+trial_ord = [1;2;3;4;5;6;7;8;9;10;11;12];
 rm_wl = [trial_ord rmssd201;
     trial_ord rmssd202;
     trial_ord rmssd203;
@@ -91,7 +92,6 @@ rm_wl = [trial_ord rmssd201;
     trial_ord rmssd215;];
 
 
-trial_ord = [1;2;3;4;5;6;7;8;9;10;11;12];
 scatter(trial_ord, rmssd201,'filled','MarkerFaceColor',rand(1,3),'DisplayName','Part 201')
 scatter(trial_ord, rmssd202,'filled','MarkerFaceColor',rand(1,3),'DisplayName','Part 202')
 scatter(trial_ord, rmssd203,'filled','MarkerFaceColor',rand(1,3),'DisplayName','Part 203')

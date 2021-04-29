@@ -4,8 +4,8 @@ clear workspace;
 global ColOrd;
 ColOrd = [0.634197879289704,0.598590500684565,0.335478586307354;0.141323291186943,0.668487146264776,0.619568612502970;0.0793022450665238,0.894564090918275,0.992885717464124;0.876145347529076,0.0873355239070054,0.648005694952403;0.420428701240150,0.539010349313424,0.539775820318468;0.487663607210372,0.428449936007297,0.232254753050780;0.460325494339181,0.617153494459035,0.739832227063707;0.515677249607505,0.558875876956837,0.888992345152850;0.271994390193763,0.225850688199737,0.859807625912606;0.231579838051303,0.104519529950634,0.597060788610351;0.899534076872039,0.00997765604969036,0.654752143480193;0.908697326644413,0.0591533040753343,0.915013993756726;0.603642852234244,0.322652370507717,0.433183080639157;0.365236483082946,0.779476506848221,0.289760755842240;0.634197879289704,0.598590500684565,0.335478586307354];
 
-load('change scores.mat');
-data = change_scores;
+load('raw data.mat');
+data = raw_data;
 
 data.HRV_pNN50(isnan(data.HRV_pNN50)) = 0;
 data.Workload = [];
@@ -21,76 +21,140 @@ data_without_TL.Taskload = [];
 
 %% Type 1 Model
 formula_1 = ...
-"SART ~ 1 + HR*RspAmp + HR*MeanPupilDiameter + RMSSD*SDNN + RMSSD*RspRate + SDNN*RspRate"+...
-         " + SDNN*MeanPupilDiameter + RspAmp*MeanPupilDiameter";
-mdl_1 = stepwiseglm(data_without_TL);
-%mdl_1 = fitglm(data_without_TL, formula_1);
-type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
-%[type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
-%[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1);
+"SART ~ 1 + ECG_Rate_Mean*HRV_MeanNN + ECG_Rate_Mean*RSP_Amplitude + HRV_RMSSD:HRV_pNN50 + HRV_RMSSD*RSP_Rate + HRV_RMSSD*MeanPupilDiameter + HRV_MeanNN:HRV_pNN50 + HRV_SDNN:HRV_TINN + HRV_SDNN:RSP_Rate + HRV_pNN50:MeanPupilDiameter";
+%mdl_1 = stepwiseglm(data_without_TL, formula_1, 'Criterion', 'aic','Verbose',2);
+
+mdl_1 = fitglm(data_without_TL, formula_1);
+ type_1_f1 = plotMdl(mdl_1,data_without_TL, 1);
+pie_1 = pieChartModel(mdl_1.CoefficientNames);
+[type_1_f2, type_1_q_sq_B] = LOOCV_B(mdl_1,data, 1, formula_1); %This is not a typo! LOOCV_B needs the ID
+[type_1_f3, type_1_q_sq_C] = LOOCV_C(mdl_1,data_without_TL, 1, formula_1);
 
 %% Type 2 Model
 formula_2 = ...
-    "SART ~ 1 + MeanPupilDiameter + TrialOrder + RMSSD*Taskload + SDNN*pNN50"+...
-          "+ pNN50*RspRate + RspAmp*RspRate + RspAmp*Taskload + RspRate*Taskload";
-mdl_2 = stepwiseglm(data_without_demographics);
-%mdl_2 = fitglm(data_without_demographics, formula_2);
+'SART~ 1 + ECG_Rate_Mean + MeanPupilDiameter -HRV_pNN50 -Taskload + HRV_MeanNN*HRV_SDNN + HRV_MeanNN*HRV_pNN50 + HRV_MeanNN*TrialOrder + HRV_SDNN*HRV_pNN50 + HRV_SDNN*RSP_Amplitude + HRV_CVNN*RSP_Amplitude + HRV_CVNN*TrialOrder + HRV_TINN:Taskload + RSP_Rate:MeanPupilDiameter + RSP_Rate:Taskload'
+%mdl_2 = stepwiseglm(data_without_demographics, formula_2, 'Criterion','aic');
+mdl_2 = fitglm(data_without_demographics, formula_2);
 type_2_f1 = plotMdl(mdl_2,data_without_demographics, 2);
-%[type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
-%[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2);
+pie_2 = pieChartModel(mdl_2.CoefficientNames);
+[type_2_f2, type_2_q_sq_B] = LOOCV_B(mdl_2,data, 2, formula_2); %This is not a typo! LOOCV_B needs the ID
+[type_2_f3, type_2_q_sq_C] = LOOCV_C(mdl_2,data_without_demographics, 2, formula_2);
 
 %% Type 3 Model
 formula_3 = ...
-    "SART ~ 1 + HR*TrialOrder + RMSSD*Age + RMSSD*Sex + RMSSD*Taskload + RMSSD*TrialOrder"+...
-          "+ SDNN*MeanPupilDiameter + pNN50*Sex + RspRate*BlinkCount + RspRate*Age"+...
-          "+ RspRate*Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex"+...
-          "+ BlinkCount*Age + BlinkCount*Sex + BlinkCount*TrialOrder + Age*Sex" +...
-          "+ Sex*Taskload";
-mdl_3 = stepwiseglm(data_without_ID);
-%mdl_3 = fitglm(data_without_ID,formula_3);
+    'SART~1 + ECG_Rate_Mean:HRV_pNN50-HRV_SDNN + ECG_Rate_Mean:Sex + ECG_Rate_Mean:TrialOrder + HRV_RMSSD*Age + HRV_RMSSD:Taskload + HRV_RMSSD:TrialOrder + HRV_SDNN*MeanPupilDiameter + HRV_SDNN*Age + HRV_SDSD*Age + HRV_SDSD:TrialOrder + HRV_CVSD*Sex + HRV_pNN50*BlinkCount + HRV_pNN50*Sex + RSP_Rate*MeanPupilDiameter + RSP_Rate*BlinkCount + RSP_Rate*Age + RSP_Rate*Sex + RSP_Rate:Taskload + MeanPupilDiameter*Age + MeanPupilDiameter*Sex + BlinkCount*Sex + BlinkCount:TrialOrder + Age*Sex + Sex:Taskload'
+
+%mdl_3 = stepwiseglm(data_without_ID, formula_3, 'Criterion', 'aic');
+mdl_3 = fitglm(data_without_ID,formula_3);
 type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
-%[type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
-%[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3);
+pie_3 = pieChartModel(mdl_3.CoefficientNames);
+[type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
+[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3, formula_3);
 
 %% Type 4 Model
+formula_4 = ...
+    'SART~ 1 + HRV_RMSSD + HRV_SDSD + HRV_CVSD + ID + ECG_Rate_Mean:HRV_pNN50 + HRV_SDNN:MeanPupilDiameter + RSP_Rate:MeanPupilDiameter + HRV_pNN50*BlinkCount + RSP_Rate:BlinkCount + HRV_RMSSD:Age + HRV_SDNN:Age + HRV_SDSD:Age + RSP_Rate:Age + MeanPupilDiameter:Age + HRV_pNN50:Sex + BlinkCount:Sex + Age:Sex + HRV_RMSSD:Taskload + RSP_Rate:Taskload + Sex:Taskload + ECG_Rate_Mean:TrialOrder + HRV_RMSSD:TrialOrder + HRV_SDSD:TrialOrder'
+formula_4 = ...
+    'SART~ 1 + HRV_RMSSD + HRV_SDSD + HRV_CVSD + ID + ECG_Rate_Mean:HRV_pNN50 + HRV_SDNN:MeanPupilDiameter + RSP_Rate:MeanPupilDiameter + HRV_pNN50*BlinkCount + RSP_Rate:BlinkCount   + HRV_RMSSD:Taskload + RSP_Rate:Taskload  + ECG_Rate_Mean:TrialOrder + HRV_RMSSD:TrialOrder + HRV_SDSD:TrialOrder'
 
 formula_4 = ...
-    "SART ~ 1 + ID + HR + SDNN  + Taskload + TrialOrder + HR:pNN50 + HR:RspRate " +...
-          "+ RMSSD:Taskload + HR:TrialOrder + RMSSD:TrialOrder";      
-      
-mdl_4 = stepwiseglm(data);
-%mdl_4 = fitglm(data,formula_4 );
+    'SART~1 + HRV_RMSSD + HRV_SDSD + ID + HRV_SDNN:MeanPupilDiameter + RSP_Rate:MeanPupilDiameter + HRV_RMSSD:Taskload + RSP_Rate:Taskload + HRV_RMSSD:TrialOrder + HRV_SDSD:TrialOrder'
+
+
+%mdl_4 = stepwiseglm(data,formula_4);
+mdl_4 = fitglm(data,formula_4 );
 type_4_f1 = plotMdl(mdl_4,data, 4);
+pie_4 = pieChartModel(mdl_4.CoefficientNames);
 % We cannot do LOOCV_B for Model types 4 and 5
-%[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4);
+[type_4_f3, type_4_q_sq_C] = LOOCV_C(mdl_4,data, 4, formula_4);
 
 %% Save models
 %Save Figs
-% savePlots(type_1_f1, 1, '0');
-% savePlots(type_1_f2, 1, 'B');
-% savePlots(type_1_f3, 1, 'C');
-% 
-% savePlots(type_2_f1, 2, '0');
-% savePlots(type_2_f2, 2, 'B');
-% savePlots(type_2_f3, 2, 'C');
-% 
-% savePlots(type_3_f1, 3, '0');
-% savePlots(type_3_f2, 3, 'B');
-% savePlots(type_3_f3, 3, 'C');
-% 
-% savePlots(type_4_f1, 4, '0');
-% savePlots(type_4_f3, 4, 'C');
-% 
-% %Save Coeffs
-% saveCoeffs(mdl_1, 1);
-% saveCoeffs(mdl_2,2);
-% saveCoeffs(mdl_3,3);
-% saveCoeffs(mdl_4,4);
+savePlots(type_1_f1, 1, '0');
+savePlots(type_1_f2, 1, 'B');
+savePlots(type_1_f3, 1, 'C');
+savePlots(pie_1, 1, 'p')
+
+savePlots(type_2_f1, 2, '0');
+savePlots(type_2_f2, 2, 'B');
+savePlots(type_2_f3, 2, 'C');
+savePlots(pie_2, 2, 'p')
+
+savePlots(type_3_f1, 3, '0');
+savePlots(type_3_f2, 3, 'B');
+savePlots(type_3_f3, 3, 'C');
+savePlots(pie_3, 3, 'p')
+
+savePlots(type_4_f1, 4, '0');
+savePlots(type_4_f3, 4, 'C');
+savePlots(pie_4, 4, 'p')
+
+%Save Coeffs
+saveCoeffs(mdl_1, 1);
+saveCoeffs(mdl_2,2);
+saveCoeffs(mdl_3,3);
+saveCoeffs(mdl_4,4);
 
 
 
 %% Helper Functions
-%LOO_data should include the workload/SA value
+function fig = pieChartModel(coeffs)
+
+    fig = figure('units','normalized','outerposition',[0 0 1 1]);
+    ekg_count = 0;
+    rsp_count = 0;
+    eye_count = 0;
+    demo_count = 0;
+    observable_count = 0;
+    
+    size = length(coeffs);
+    labels = {};
+    pie_data = [];
+    
+    for (i=1:size)
+       if contains(coeffs{1,i}, ["HRV","ECG"])
+          ekg_count = ekg_count + 1; 
+          labels{1} = "EKG";
+          pie_data(1) = ekg_count; 
+       end
+       if contains(coeffs{1,i}, "RSP")
+          rsp_count = rsp_count + 1;
+          labels{2} = "RSP";
+          pie_data(2) = rsp_count; 
+       end
+       if contains(coeffs{1,i}, ["BlinkCount","Pupil"])
+          eye_count = eye_count + 1; 
+          labels{3} = "EYE";
+          pie_data(3) = eye_count; 
+       end
+       if contains(coeffs{1,i}, ["Taskload","TrialOrder"])
+          observable_count = observable_count + 1; 
+          labels{4} = "OBSERVABLES";
+          pie_data(4) = observable_count; 
+       end
+       if contains(coeffs{1,i}, ["Age","Sex_0","ID"])
+          demo_count = demo_count + 1; 
+          labels{5} = "DEMOGRAPHICS";
+          pie_data(5) = demo_count; 
+       end
+
+    end
+    
+    for (j=1:length(labels))
+        if isempty(labels{:,j})
+            pie_data(j) = [];
+        end
+        
+    end
+    
+    
+    pie(pie_data, labels);
+    title('Feature Breakdown By Source');
+    
+    
+end
+
+%LOO_data should include the either workload or SA value
 function [q_sq, term_1, term_2] = calculate_q_sq(LOO_data, CV_data, mdl)
    
     
@@ -233,18 +297,24 @@ end
 function [] = savePlots(fig, type, LOOCV)
 %LOOCV = 0, normal fit, =1, B, =2, =C
     
-    path = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\all model figurs\';
+    path = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\final model figurs\';
     if (LOOCV == '0')
         saveas(fig, strcat(path,'Type',string(type),'.jpg'));
         return;
     end
+    
+     if (LOOCV == 'p')
+        saveas(fig, strcat(path,'pie chart ', string(type), '.jpg'));
+        return;
+     end
+     
     saveas(fig, strcat(path,'Type',string(type),' LOOCV',string(LOOCV),'.jpg'));
 end
 
 function [] = saveCoeffs(mdl, type)
 %LOOCV = 0, normal fit, =1, B, =2, =C
     coeffs = mdl.Coefficients;
-    path = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\all model coeffs\';
+    path = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\regression models\final model coeffs\';
    
     writetable(coeffs, strcat(path,'Type',string(type),' Coeffs.csv'),'WriteRowNames',true);
         

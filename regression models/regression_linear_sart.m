@@ -34,6 +34,7 @@ for i=1:12:180
     grid on;
     
 end
+formula="";
 topTitle = formula;
 topTitle = strcat(formula, sprintf('\n SA Psychophysiological Regression Model Performance \nAIC = %4.2f BIC = %4.2f R^{2} = %4.2f adjR^{2} = %4.2f',mdl.ModelCriterion.AIC,mdl.ModelCriterion.BIC,mdl.Rsquared.Ordinary,mdl.Rsquared.Adjusted));
 

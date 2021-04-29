@@ -72,7 +72,7 @@ ekg_features_baseline = ...
  repmat(ekg_table(14,ekg_features_baseline_index),[12,1]);
  repmat(ekg_table(15,ekg_features_baseline_index),[12,1]);
 ];
-data{:,1:length(ekg_features_baseline_index)} - ekg_features_baseline{:,:};
+raw_data{:,1:length(ekg_features_baseline_index)} - ekg_features_baseline{:,:};
 
 %RSP Features
 rsp_features_baseline_index = [3 4];
@@ -94,11 +94,11 @@ rsp_features_baseline = ...
  repmat(rsp_table(14,rsp_features_baseline_index),[12,1]);
  repmat(rsp_table(15,rsp_features_baseline_index),[12,1]);
 ];
-data{:,5:6} - rsp_features_baseline{:,:};
+raw_data{:,5:6} - rsp_features_baseline{:,:};
 
-baselined_data = data;
-baselined_data{:,1:4} = data{:,1:length(ekg_features_baseline_index)} - ekg_features_baseline{:,:};
-baselined_data{:,5:6} = data{:,5:6} - rsp_features_baseline{:,:};
+baselined_data = raw_data;
+baselined_data{:,1:4} = raw_data{:,1:length(ekg_features_baseline_index)} - ekg_features_baseline{:,:};
+baselined_data{:,5:6} = raw_data{:,5:6} - rsp_features_baseline{:,:};
 
 %save('baselined data.mat','baselined_data');
 
@@ -106,3 +106,28 @@ baselined_data{:,5:6} = data{:,5:6} - rsp_features_baseline{:,:};
 
 control_features = [ekg_table(:,ekg_features_baseline_index) rsp_table(:,rsp_features_baseline_index)]
 %save('control data.mat', 'control_features');
+
+
+%% Make normalized data
+control_means = mean(control_features{:,:}, 1);
+control_stddev = std(control_features{:,:}); %For some reason, you don't use dim =1 here.
+
+% do a z-transform on raw data EKG, RSP data using control (baseline)
+% mean/stddev
+% TODO: Make sure indexing is right
+raw_features = raw_data(:, 1:6);
+z_transform_data = (raw_features{:,:} - control_means)./control_stddev;
+
+% Do a z-transform on raw EYE data using low WL mean/stddev
+eye_raw = raw_data(:,[7 8 12]);
+lowTL_eye_raw = eye_raw(eye_raw{:,3} == 2, [1 2]);
+lowTL_eye_means = mean(lowTL_eye_raw{:,:},1);
+lowTL_eye_stddev = std(lowTL_eye_raw{:,:});
+
+z_eye = (eye_raw{:,1:2} - lowTL_eye_means)./lowTL_eye_stddev;
+
+%%
+normalized_data = raw_data;
+normalized_data{:,1:6} = z_transform_data;
+normalized_data{:,7:8} = z_eye;
+%save('normalized data.mat', 'normalized_data');

@@ -5,7 +5,7 @@ donk = [1 2 4 12];
 % for d=donk
 %     mdl = myWorkloadModel(d,1);
 % end
-m = myWorkloadModel([1 4 12 23],1);
+m = myWorkloadModel([1 4 12 23],0);
 
 function mdl = myWorkloadModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
@@ -26,7 +26,7 @@ function mdl = myWorkloadModel(data_index,save)
             y(i:i+11, 2), y(i:i+11, 3), y(i:i+11,4),wl(i:i+11), 'VariableNames',...
             {'TrialOrder','Taskload','HR','SDNN','pNN50','HFn','Workload'});
         mdl = fitglm(dataTable,...,
-            'Workload~ HR+SDNN+pNN50+HFn + HR:pNN50 + SDNN:pNN50 + HR:HFn + SDNN:HFn + pNN50:HFn + SDNN:pNN50:HFn + TrialOrder + Taskload',...
+            'Workload~ HR + SDNN + pNN50+ Taskload + TrialOrder',...
            'ResponseVar','Workload','Intercept',true);
         
         scatter(wl(i:i+11),mdl.Fitted.Response);

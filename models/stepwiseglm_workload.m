@@ -5,7 +5,7 @@ donk = [1 2 4 12];
 % for d=donk
 %     mdl = myWorkloadModel(d,1);
 % end
-m = myWorkloadModel([1 4 12 23],1);
+m = myWorkloadModel([1 4 12 23],0);
 
 function mdl = myWorkloadModel(data_index,save)
     figure('units','normalized','outerposition',[0 0 1 1]);
@@ -82,7 +82,7 @@ function mdl = myWorkloadModel(data_index,save)
     end
     function [trial_order,tl,y,wl] = loadData()
 
-        workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
+        workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\fakeWorkload.csv');
         taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');
         hrv201 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part201\Time Based HRV Analyses By Trial.csv');
         hrv202 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part202\Time Based HRV Analyses By Trial.csv');

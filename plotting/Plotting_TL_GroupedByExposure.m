@@ -40,7 +40,7 @@ wl212= workload(2:end,12);
 wl213= workload(2:end,13);
 wl215= workload(2:end,15);
 
-data_index = 1;
+data_index = 4;
 normalize=0; %Set normalize to 1 if you want to nomralize, 0 if you want raw
 %1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 rmssd201 = hrv201(:,data_index);
@@ -160,7 +160,7 @@ for i=1:12
 
     gscatter(group_by_exposure,rm_wl(i,13:24),rm_wl(i,1:12),'rkg','*o>');
     xlabel('Exposure Instance')
-    ylabel('HR')
+    ylabel('SDNN')
     xlim([1 4]);
     grid on;
     grid minor;
@@ -171,7 +171,7 @@ for i=1:12
     hold off;
 end
 legend({'Low TL','Med TL','Hi TL'},'Location','northeastoutside');
-suptitle('Individual Exposure Instances vs HR grouped by Taskload')
+suptitle('Individual Exposure Instances vs SDNN grouped by Taskload')
 
 
 % 

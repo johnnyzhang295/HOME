@@ -1,7 +1,7 @@
 clear workspace;
 clear all;
 
-for idnum=1:15 %Change to 1:15
+for idnum=1 %Change to 1:15
 try
     if (idnum>9)
         id = strcat('2',string(idnum));
@@ -14,8 +14,11 @@ fn = 'eye_raw_features.mat';
 load(strcat(filepath,fn)); 
 
 blinks = raw_features(raw_features.Diameters < .1,:);
-%blinks_right_eye = blinks(blinks.Confidence > .6,:);
-blinks_right_eye = blinks(blinks.ID == 0,:);
+blinks_right_eye = blinks(blinks.Confidence > .9,:);
+%blinks_right_eye = blinks_right_eye(blinks_right_eye.ID == 0,:);
+
+blinks_timestamps = load(strcat(filepath,'blinks_timestamps.csv'));
+
 
 sync_data = readmatrix(strcat(filepath,'Part',id,'_BiopacLSLTimes.csv'));
 sync = sync_data(:,2);

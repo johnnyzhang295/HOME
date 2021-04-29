@@ -1,7 +1,7 @@
 clear workspace;
 clear all;
 
-for idnum=13:15 %Change to 1:15
+for idnum=1:15 %Change to 1:15
 try
     if (idnum>9)
         id = strcat('2',string(idnum));
@@ -19,7 +19,7 @@ load(strcat(filepath,fn));
 %col 4 is Confidence
 
 sync_data = readmatrix(strcat(filepath,'Part',id,'_BiopacLSLTimes.csv'));
-taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings.csv');
+taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload.csv');
 blinks_timestamps = load(strcat(filepath,'blinks_timestamps.csv'));
 sync = sync_data(:,2);
 
@@ -118,7 +118,7 @@ suptitle(fig_title);
 filtered_features_by_trial = filtered_features_by_trial'; %Transpose to Nx1 column vector;
 
 subject_taskload_index = idnum;
-subject_taskload = taskload(subject_taskload_index,:)';
+subject_taskload = taskload(:,subject_taskload_index);
 
 trial_nums = 1:12;
 
@@ -130,7 +130,7 @@ low_tl_data = filtered_features_by_trial{low_tl_indexes}; %Get the data by the i
 med_tl_data = filtered_features_by_trial{med_tl_indexes};
 hi_tl_data = filtered_features_by_trial{hi_tl_indexes};
 workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\workload.csv');
-subject_workload = workload(2:end,idnum);
+subject_workload = workload(:,idnum);
 taskload_workload_table = table(subject_taskload, subject_workload, medians, means, blink_count, 'VariableNames',{'Taskload','Workload','Median','Mean','Blink Count'});
 
 filtered_features_by_trial(:,2) = {taskload_workload_table};
@@ -189,6 +189,6 @@ saveas(gcf,out_figure);
 
 catch ERR
     display(ERR.message);
-    display(strcat("Occurs on Line: ",ERR.stack.line));
+    display(strcat("Occurs on Line: ",string(ERR.stack.line)));
 end
 end

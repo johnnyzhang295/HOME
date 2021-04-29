@@ -9,11 +9,11 @@ all_marks = {'o','+','*','.','_','|','x','s','d','^','v','>','<','p','h'};
 %figure('units','normalized','outerposition',[0 0 1 1]);
 fp = 'C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part';
 data_types = {'double','double','double','double',...
-    'double','double','double','double'};
+    'double','double','double','double','double'};
 data_names = {'Taskload','Workload','Median','Mean','BC',...
-    'Trial','Normalized BC','Normalized Mean'};
+    'Trial','Normalized BC','Normalized Mean','PD_STD'};
 
-data = table('Size',[180 8],'VariableTypes',data_types,'VariableNames',data_names);
+data = table('Size',[180 length(data_types)],'VariableTypes',data_types,'VariableNames',data_names);
 ind = 1;
 for id=201:215
    counter = id - 200;
@@ -30,10 +30,12 @@ for id=201:215
    data.Trial(ind:ind+11) = raw_eye_features.summary_table.TrialOrder;
    data.("Normalized BC")(ind:ind+11) = raw_eye_features.summary_table.NormalizedBC;
    data.("Normalized Mean")(ind:ind+11) = raw_eye_features.summary_table.NormalizedMean;
-   
    ind = ind + 12;
 end
 
+doyadirty(data);
+
+function [] = doyadirty(data)
 figure('units','normalized','outerposition',[0 0 1 1]);
 hold on;
 gscatter(data.Workload, data.("Normalized BC"), data.Taskload);
@@ -49,13 +51,35 @@ plot((1:60)',yfit,'-g','HandleVisibility','off');
 p = polyfit((1:60)',data.("Normalized BC")(data.Taskload == 4,:),1);
 yfit = polyval(p,(1:60)');
 plot((1:60)',yfit,'-b','HandleVisibility','off');
+legend({'Low','Medium','High'})
+xlabel('Workload');
+ylabel('Normalized Blink Count');
+title('Normalized BC vs Workload Grouped with TL');
+
+
+
+figure('units','normalized','outerposition',[0 0 1 1]);
+hold on;
+gscatter(data.Workload, data.("Normalized Mean"), data.Taskload);
+
+p = polyfit((1:60)',data.("Normalized Mean")(data.Taskload == 2,:),1);
+yfit = polyval(p,(1:60)');
+plot((1:60)',yfit,'-r','HandleVisibility','off');
+
+p = polyfit((1:60)',data.("Normalized Mean")(data.Taskload == 3,:),1);
+yfit = polyval(p,(1:60)');
+plot((1:60)',yfit,'-g','HandleVisibility','off');
+
+p = polyfit((1:60)',data.("Normalized Mean")(data.Taskload == 4,:),1);
+yfit = polyval(p,(1:60)');
+plot((1:60)',yfit,'-b','HandleVisibility','off');
 
 
 legend({'Low','Medium','High'})
 xlabel('Workload');
 ylabel('Normalized Pupil Diameter');
 title('Normalized PD vs Workload Grouped with TL');
-
+end
 function [] = TLandWL()
 figure('units','normalized','outerposition',[0 0 1 1]);
 boxplot(data.("Normalized BC"), data.Taskload);

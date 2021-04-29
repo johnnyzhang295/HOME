@@ -46,17 +46,39 @@ formula_5 = ...
 type_5_f1 = plotMdl(mdl_5,data, 5);
 % %pie_5 = pieChartModel(mdl_5.CoefficientNames);
 % % We cannot do LOOCV_B for Model types 4 and 5
-% %[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
+% [type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
+% %[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
+% 
+% type_5_f4 = plotRes(mdl_5);
+formula_3 = ...
+    'SART~ 1 -TrialOrder - Taskload  + ECG_Rate_Mean*TrialOrder + HRV_MeanNN*RSP_Amplitude + RSP_Rate*Taskload + RSP_Rate*TrialOrder + Sex*Taskload'
+
+%mdl_3 = stepwiseglm(data_without_ID);
+mdl_3 = fitglm(data_without_ID,formula_3);
+type_3_f1 = plotMdl(mdl_3,data_without_ID, 3);
+pie_3 = pieChartModel(mdl_3.CoefficientNames);
+[type_3_f2, type_3_q_sq_B] = LOOCV_B(mdl_3,data, 3, formula_3); %This is not a typo! LOOCV_B needs the ID
+[type_3_f3, type_3_q_sq_C] = LOOCV_C(mdl_3,data_without_ID, 3,formula_3, "", 1);
+type_3_f4 = plotRes(mdl_3);
+
+formula_5 = ...
+    'SART~ 1 + HRV_TINN + TrialOrder + ID*Taskload'
+%mdl_5 = stepwiseglm(data);
+ mdl_5 = fitglm(data,formula_5 );
+ %[type_5_f2, type_5_q_sq_B] = LOOCV_B(mdl_5,data, 5, formula_5)
+type_5_f1 = plotMdl(mdl_5,data, 5);
+% %pie_5 = pieChartModel(mdl_5.CoefficientNames);
+% % We cannot do LOOCV_B for Model types 4 and 5
+% [type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_4_f3, 2);
 % %[type_5_f5, type_5_q_sq_D] =LOOCV_D(data, 5, formula_5, '+ID*Taskload') %You need to feed a model 3 formula into LOOCV D
 % 
 % type_5_f4 = plotRes(mdl_5);
 
-
-
+[type_5_f3, type_5_q_sq_C] = LOOCV_C(mdl_5,data, 5, formula_5, type_3_f3, 2);
 
 %% Save models
 %Save Figs
-save = 1;
+save = 0;
 if (save == 1)
 
     savePlots(type_4_f1, 4, '0');

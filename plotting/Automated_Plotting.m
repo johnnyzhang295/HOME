@@ -3,12 +3,12 @@ clear all;
 donk = [1 2 4 12];
 
 %Scatterplots
-% for d=donk
+for d=donk
 %     myPlot(d,0,0,1,0);
-%     myPlot(d,0,1,1,0);
+%    myPlot(d,0,1,1,0,0);
 %     myPlot(d,0,2,1,0);
 %     myPlot(d,1,0,1,0);
-%     myPlot(d,1,1,1,0);
+%     myPlot(d,1,1,1,0,0);
 %     myPlot(d,1,2,1,0);
 %     
 %     myPlot(d,0,0,1,1);
@@ -17,16 +17,15 @@ donk = [1 2 4 12];
 %     myPlot(d,1,0,1,1);
 %     myPlot(d,1,1,1,1);
 %     myPlot(d,1,2,1,1);
-% end
-
-%Boxplots
-for d=donk
-    myPlot(d,0,0,1,0,1);
-    myPlot(d,0,1,1,0,1);
 end
 
+%Boxplots
+% for d=donk
+%     myPlot(d,0,0,1,0,1);
+%     myPlot(d,0,1,1,0,1);
+% end
 
-
+myPlot(1,0,1,0,0,0);
 %set data_index 1=rate mean, 2=RMSSD, 4=SDNN, 12=PNN50
 %Set normalize to 1 if you want to nomralize, 0 if you want it raw, 2 for change scores
 %set tl_bool to 1 if you want taskload, 0 if you want workload, 2 if you want both
@@ -210,6 +209,8 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on, boxplot_bool)
                     boxplot(tl_vs_data(i,13:24),tl_vs_data(i,1:12));
                 else
                     gscatter(xfit,rm_wl_t(i,13:24),tl_vs_data(i,1:12));
+                    %gscatter(xfit,rm_wl_t(i,13:24)-yfit,tl_vs_data(i,1:12));
+                    %subtract out mean trendline from each y-value
                 end
             elseif (tl_bool==2)
                 
@@ -249,7 +250,11 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on, boxplot_bool)
                 title(titl);
             end
             if (boxplot_bool == 0)
-                legend('Location','best')
+                if (tl_bool == 1)
+                    legend({'Low TL', 'Med TL', 'Hi TL'},'Location','best')
+                else
+                    legend('Location','best')
+                end
             end
             hold off;
         end
@@ -298,10 +303,6 @@ function fig = myPlot(data_index, normalize, tl_bool, save, on, boxplot_bool)
     
     if (boxplot_bool ==1)
         titl = strcat(titl,' boxplotted');
-    elseif(boxplot_bool==0)
-        titl = strcat(titl,' boxplotted');
-    else
-        titl=strcat(titl,' boxplotted');
     end
     
         

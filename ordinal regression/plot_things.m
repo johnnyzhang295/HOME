@@ -9,7 +9,7 @@ mse2 = [];
 
     load('../regression models/raw data.mat');
 
-for type = 4:num_types
+for type = 3:3
 
     fn = strcat('type_'+string(type)+'_model_wl_predictions.mat');
     load(fn);
@@ -100,7 +100,8 @@ end
 
 xx = 5;
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
-for type = 4:xx
+    pos = 2;
+for type = 1:3
 %% plot C
 fn = strcat('type_'+string(type)+'_model_wl_predictions.mat');
     load(fn);
@@ -115,8 +116,11 @@ fn = strcat('type_'+string(type)+'_model_wl_predictions.mat');
     LOOCV_C = double(LOOCV_C);
     
     data = raw_data;
-    type = type - 2; % only for 4/5 nonsense
-    subplot(2,4,type);
+   %type = type - 2; % only for 4/5 nonsense
+    
+   subplot(2,4,pos);
+   
+   pos = pos + 1;
     plot(data.Workload,LOOCV_C,'o','Color','r')
         
     ylim([0,11])
@@ -138,14 +142,19 @@ fn = strcat('type_'+string(type)+'_model_wl_predictions.mat');
     plot([0,11],[0,11],'-','Color','b');
     ax = gca;
     ax.FontSize = 14;
+    if pos == 3
+        ylabel('Predicted WL Response');
+        xlabel('Subject WL Score');
+        legend({'Predicted Trial Value', 'Line of Best Fit', 'Ideal Relationship'}, 'FontSize', 14, 'Location', 'northwest' )
+
+    end
     
  if type == 2
           
     ylabel('Predicted WL Response');
-    %legend({'Predicted Trial Value', 'Line of Best Fit', 'Ideal Relationship'}, 'FontSize', 14, 'Location', 'northwest' )
-
+    %
  end
-      type = type + 2; % more 4/5 nonsense
+      %type = type + 2; % more 4/5 nonsense
     topTitle =strcat('Type',{' '},string(type));
     title(topTitle);
 end
@@ -266,28 +275,27 @@ mdl_4_coeffs  = {
 'HRV_MedianNN',
 'HRV_MadNN',
 'HRV_MCVNN',
-'HRV_IQRNN',
 'HRV_pNN50',
 'HRV_pNN20',
 'HRV_TINN',
-'HRV_HTI',
 'RSP_Amplitude',
 'RSP_Rate',
 'MeanPupilDiameter',
-'Age',
 'Taskload',
 'TrialOrder',
-'Sex',
-'ID',
+'BlinkCount',
 'HRV_MeanNN:HRV_MadNN',
 'RSP_Amplitude:Taskload',
-'HRV_pNN50:RSP_Amplitude',
 'HRV_MCVNN:HRV_TINN',
 'MeanPupilDiameter:TrialOrder',
+'HRV_pNN50:RSP_Amplitude',
 'RSP_Amplitude:RSP_Rate',
-'HRV_HTI:Taskload',
-'RSP_Amplitude:MeanPupilDiameter',
-'RSP_Rate:ID' 
+'HRV_pNN20:MeanPupilDiameter'
+'HRV_CVNN:HRV_pNN20',
+'HRV_MeanNN:MeanPupilDiameter',
+'HRV_MedianNN:MeanPupilDiameter',
+'HRV_MCVNN:HRV_TINN'
+
 }';
 pie_4 = pieChartModel(mdl_4_coeffs);
 savePlots(pie_4, 4, 'p');
@@ -297,9 +305,7 @@ mdl_5_coeffs  = {
 'HRV_RMSSD',
 'HRV_MeanNN',
 'HRV_SDNN',
-'HRV_SDSD',
 'HRV_CVNN',
-'HRV_CVSD',
 'HRV_MedianNN',
 'HRV_MadNN',
 'HRV_MCVNN',
@@ -314,20 +320,16 @@ mdl_5_coeffs  = {
 'BlinkCount',
 'Taskload',
 'TrialOrder',
-'ID',
-'HRV_SDSD x BlinkCount',
 'MeanPupilDiameter x TrialOrder',
-'HRV_pNN20 x ID',
-'RSP_Amplitude x Taskload',
-'HRV_pNN50 x RSP_Amplitude',
-'HRV_MadNN x HRV_pNN50',
-'HRV_MeanNN x MeanPupilDiameter',
 'HRV_MadNN x ID',
 'HRV_pNN20 x MeanPupilDiameter',
-'HRV_IQRNN x HRV_pNN20',
-'HRV_SDNN x HRV_MCVNN',
-'HRV_HR x HRV_IQRNN',
-'HRV_MadNN x HRV_pNN20'
+'RSP_Amplitude:RSP_Rate',
+'HRV_SDNN:BlinkCount',
+'HRV_MCVNN:HRV_HTI',
+'HRV_MadNN:HRV_pNN20',
+'MeanPupilDiameter:BlinkCount'
+'HRV_HTI:RSP_Rate',
+'HRV_HTI:TrialOrder'
 }';
 pie_5 = pieChartModel(mdl_5_coeffs);
 savePlots(pie_5, 5, 'p');

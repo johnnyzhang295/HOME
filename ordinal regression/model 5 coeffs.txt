@@ -1,0 +1,105 @@
+formula: 
+resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + MedianNN + MadNN + MCVNN + IQRNN + pNN50 + pNN20 + TINN + HTI + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + ID + Taskload:ID + MeanPupilDiameter:TrialOrder + MadNN:pNN50 + IQRNN:pNN20 + pNN20:MeanPupilDiameter + MadNN:ID + RSP_Amplitude:RSP_Rate + SDNN:BlinkCount + MCVNN:HTI + MadNN:pNN20 + MeanPupilDiameter:BlinkCount + HTI:RSP_Rate + HTI:TrialOrder
+data:    predictors
+
+ link  threshold nobs logLik  AIC    niter max.grad cond.H 
+ logit flexible  180  -163.03 488.07 9(0)  1.03e-09 1.9e+14
+
+Coefficients:
+                               Estimate Std. Error z value Pr(>|z|)    
+HR                            6.229e-01  3.984e-01   1.563 0.117964    
+RMSSD                        -2.141e-01  8.987e-02  -2.382 0.017209 *  
+MeanNN                        1.851e-02  5.676e-02   0.326 0.744277    
+SDNN                         -1.386e+00  3.422e-01  -4.048 5.16e-05 ***
+CVNN                          1.171e+03  2.618e+02   4.472 7.75e-06 ***
+MedianNN                      5.314e-02  5.741e-02   0.926 0.354630    
+MadNN                        -3.261e-01  7.224e-01  -0.451 0.651693    
+MCVNN                        -7.774e+02  4.459e+02  -1.743 0.081257 .  
+IQRNN                         1.521e+00  3.020e-01   5.037 4.73e-07 ***
+pNN50                        -7.353e-01  1.935e-01  -3.800 0.000145 ***
+pNN20                         1.407e+00  2.490e-01   5.649 1.61e-08 ***
+TINN                         -9.998e-04  1.244e-02  -0.080 0.935964    
+HTI                           1.370e+01  3.611e+00   3.794 0.000148 ***
+RSP_Amplitude                 4.595e+00  1.532e+00   3.000 0.002700 ** 
+RSP_Rate                      1.511e+00  5.299e-01   2.852 0.004343 ** 
+MeanPupilDiameter             1.031e+01  1.978e+00   5.211 1.88e-07 ***
+BlinkCount                    1.223e+00  3.427e-01   3.569 0.000358 ***
+Taskload                      5.919e+00  1.088e+00   5.441 5.30e-08 ***
+TrialOrder                    2.355e+00  5.661e-01   4.160 3.19e-05 ***
+ID2                          -1.259e+00  6.106e+00  -0.206 0.836679    
+ID3                          -1.405e+01  7.172e+00  -1.959 0.050154 .  
+ID4                           7.536e-01  6.408e+00   0.118 0.906377    
+ID5                           4.139e+01  7.369e+00   5.617 1.94e-08 ***
+ID6                           2.102e+01  8.858e+00   2.373 0.017627 *  
+ID7                          -7.388e+00  6.651e+00  -1.111 0.266635    
+ID8                          -4.730e+00  6.890e+00  -0.686 0.492422    
+ID9                          -3.689e-01  6.053e+00  -0.061 0.951394    
+ID10                          2.659e+01  7.935e+00   3.351 0.000806 ***
+ID11                         -2.105e+01  5.922e+00  -3.555 0.000378 ***
+ID12                         -2.650e+01  6.676e+00  -3.969 7.22e-05 ***
+ID13                          4.296e+00  7.648e+00   0.562 0.574293    
+ID14                         -1.194e+01  8.864e+00  -1.347 0.177903    
+ID15                         -1.363e+01  1.255e+01  -1.085 0.277710    
+Taskload:ID2                 -3.430e+00  1.207e+00  -2.841 0.004496 ** 
+Taskload:ID3                  1.505e-01  1.428e+00   0.105 0.916084    
+Taskload:ID4                 -1.354e-02  1.402e+00  -0.010 0.992295    
+Taskload:ID5                 -8.620e+00  1.416e+00  -6.086 1.16e-09 ***
+Taskload:ID6                  4.804e-01  1.343e+00   0.358 0.720567    
+Taskload:ID7                  4.317e-01  1.303e+00   0.331 0.740485    
+Taskload:ID8                  2.050e+00  1.479e+00   1.386 0.165729    
+Taskload:ID9                 -3.903e+00  1.354e+00  -2.883 0.003937 ** 
+Taskload:ID10                -5.899e+00  1.338e+00  -4.407 1.05e-05 ***
+Taskload:ID11                 1.559e+00  1.133e+00   1.377 0.168634    
+Taskload:ID12                 1.503e+00  1.297e+00   1.159 0.246461    
+Taskload:ID13                -2.148e+00  1.370e+00  -1.567 0.117005    
+Taskload:ID14                 2.364e+00  1.489e+00   1.588 0.112246    
+Taskload:ID15                -1.059e+00  1.326e+00  -0.798 0.424617    
+MeanPupilDiameter:TrialOrder -3.130e-01  7.577e-02  -4.131 3.60e-05 ***
+MadNN:pNN50                   1.877e-02  3.960e-03   4.739 2.14e-06 ***
+IQRNN:pNN20                  -2.577e-02  5.198e-03  -4.956 7.18e-07 ***
+pNN20:MeanPupilDiameter      -1.438e-01  3.118e-02  -4.614 3.96e-06 ***
+MadNN:ID2                     2.137e-01  1.139e-01   1.876 0.060647 .  
+MadNN:ID3                     4.160e-01  1.388e-01   2.997 0.002730 ** 
+MadNN:ID4                     1.844e-01  1.060e-01   1.739 0.081967 .  
+MadNN:ID5                    -1.547e-01  1.264e-01  -1.224 0.220807    
+MadNN:ID6                    -4.478e-01  2.199e-01  -2.036 0.041721 *  
+MadNN:ID7                     2.460e-01  1.142e-01   2.155 0.031175 *  
+MadNN:ID8                     1.027e-01  9.804e-02   1.048 0.294764    
+MadNN:ID9                     3.763e-01  1.169e-01   3.218 0.001290 ** 
+MadNN:ID10                   -2.567e-01  1.972e-01  -1.302 0.193079    
+MadNN:ID11                    4.813e-01  1.134e-01   4.245 2.19e-05 ***
+MadNN:ID12                    5.790e-01  1.454e-01   3.982 6.85e-05 ***
+MadNN:ID13                    1.966e-01  1.659e-01   1.185 0.236086    
+MadNN:ID14                    5.961e-01  2.243e-01   2.658 0.007855 ** 
+MadNN:ID15                    4.644e-01  2.831e-01   1.640 0.100914    
+RSP_Amplitude:RSP_Rate       -1.804e-01  6.231e-02  -2.894 0.003799 ** 
+SDNN:BlinkCount              -8.886e-03  2.659e-03  -3.342 0.000833 ***
+MCVNN:HTI                    -7.646e+01  2.191e+01  -3.490 0.000484 ***
+MadNN:pNN20                   2.085e-02  6.884e-03   3.029 0.002457 ** 
+MeanPupilDiameter:BlinkCount -1.546e-01  5.426e-02  -2.850 0.004376 ** 
+HTI:RSP_Rate                 -3.181e-01  1.284e-01  -2.477 0.013242 *  
+HTI:TrialOrder               -2.182e-01  1.014e-01  -2.153 0.031344 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold coefficients:
+     Estimate Std. Error z value
+1|2    244.96      61.67   3.972
+2|3    246.74      61.64   4.003
+3|4    253.69      61.99   4.092
+4|5    256.71      62.06   4.136
+5|6    259.76      62.14   4.181
+6|7    262.75      62.26   4.220
+7|8    267.42      62.54   4.276
+8|9    268.81      62.55   4.297
+9|10   271.42      62.59   4.336
+
+$Pseudo.R.squared.for.model.vs.null
+                             Pseudo.R.squared
+McFadden                             0.549392
+Cox and Snell (ML)                   0.890146
+Nagelkerke (Cragg and Uhler)         0.906418
+
+$Likelihood.ratio.test
+ Df.diff LogLik.diff  Chisq    p.value
+     -72     -198.77 397.55 1.5324e-46

@@ -1,0 +1,74 @@
+resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + pNN20:MeanPupilDiameter + CVNN:pNN20 + MeanNN:MeanPupilDiameter + ID + MedianNN:MeanPupilDiameter
+data:    predictors
+
+ link  threshold nobs logLik  AIC    niter max.grad cond.H 
+ logit flexible  180  -235.41 572.82 8(0)  8.20e-08 2.0e+16
+
+Coefficients:
+                               Estimate Std. Error z value Pr(>|z|)    
+HR                            -0.548576   0.375304  -1.462 0.143829    
+RMSSD                          0.027482   0.291039   0.094 0.924769    
+MeanNN                        -0.540207   0.226111  -2.389 0.016889 *  
+SDNN                           0.118658   0.311889   0.380 0.703612    
+CVNN                          46.289880 186.304649   0.248 0.803776    
+CVSD                          12.642896 200.051813   0.063 0.949609    
+MedianNN                       0.345956   0.192659   1.796 0.072544 .  
+MadNN                         -3.481848   1.497842  -2.325 0.020095 *  
+MCVNN                        980.098334 527.397919   1.858 0.063117 .  
+pNN50                         -0.067340   0.069843  -0.964 0.334961    
+pNN20                          0.671341   0.191505   3.506 0.000456 ***
+TINN                          -0.023770   0.014423  -1.648 0.099332 .  
+RSP_Amplitude                  1.289532   1.145237   1.126 0.260168    
+RSP_Rate                      -0.010478   0.132490  -0.079 0.936964    
+MeanPupilDiameter             -6.496127   4.275049  -1.520 0.128625    
+BlinkCount                     0.047798   0.043120   1.108 0.267648    
+Taskload                       3.774301   0.455808   8.280  < 2e-16 ***
+TrialOrder                     0.670025   0.304865   2.198 0.027965 *  
+ID2                           -0.346904   1.141892  -0.304 0.761282    
+ID3                            1.355439   1.679337   0.807 0.419593    
+ID4                            5.225583   1.250987   4.177 2.95e-05 ***
+ID5                            5.081632   1.681617   3.022 0.002512 ** 
+ID6                            4.816732   2.013616   2.392 0.016753 *  
+ID7                            4.371245   1.172697   3.728 0.000193 ***
+ID8                            4.557403   1.126576   4.045 5.22e-05 ***
+ID9                            2.577388   1.523590   1.692 0.090712 .  
+ID10                           3.092502   1.798058   1.720 0.085448 .  
+ID11                           3.442406   0.993483   3.465 0.000530 ***
+ID12                           4.282333   1.199998   3.569 0.000359 ***
+ID13                           4.033800   1.356919   2.973 0.002951 ** 
+ID14                          -1.028475   3.160101  -0.325 0.744836    
+ID15                           0.175504   1.560298   0.112 0.910442    
+MeanNN:MadNN                   0.002702   0.001066   2.534 0.011284 *  
+RSP_Amplitude:Taskload        -0.367125   0.103361  -3.552 0.000382 ***
+MCVNN:TINN                     0.455598   0.229409   1.986 0.047038 *  
+MeanPupilDiameter:TrialOrder  -0.143555   0.057218  -2.509 0.012110 *  
+pNN50:RSP_Amplitude            0.029610   0.017526   1.689 0.091125 .  
+RSP_Amplitude:RSP_Rate        -0.007853   0.046712  -0.168 0.866498    
+pNN20:MeanPupilDiameter       -0.099825   0.028020  -3.563 0.000367 ***
+CVNN:pNN20                    -2.617852   1.292370  -2.026 0.042804 *  
+MeanNN:MeanPupilDiameter       0.051516   0.035044   1.470 0.141548    
+MedianNN:MeanPupilDiameter    -0.035732   0.033446  -1.068 0.285362    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold coefficients:
+     Estimate Std. Error z value
+1|2   -151.54      73.35  -2.066
+2|3   -150.41      73.33  -2.051
+3|4   -146.91      73.27  -2.005
+4|5   -144.86      73.24  -1.978
+5|6   -142.79      73.23  -1.950
+6|7   -141.01      73.23  -1.926
+7|8   -138.84      73.22  -1.896
+8|9   -138.16      73.21  -1.887
+9|10  -136.36      73.20  -1.863
+$Models
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+Model: "clm, resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Taskload + TrialOrder + MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + pNN20:MeanPupilDiameter + CVNN:pNN20 + MeanNN:MeanPupilDiameter + ID + MedianNN:MeanPupilDiameter, predictors"
+Null:  "clm, resp ~ 1, predictors"                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+$Pseudo.R.squared.for.model.vs.null
+                             Pseudo.R.squared
+McFadden                             0.352519
+Cox and Snell (ML)                   0.759275
+Nagelkerke (Cragg and Uhler)         0.772879

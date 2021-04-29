@@ -216,8 +216,9 @@ rsp_base_215 = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\data\part215\RSP ba
     plot(wl,yfit,'-r','HandleVisibility','off');
     grid on;
     grid minor;
-    title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
-    title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),'     BIC: ', string(mdl.ModelCriterion.BIC)));
+    %title_1  = strcat('LOOCV for Subj ',{' '},string(pnums(leaveout,:)));
+    title_1 = 'Workload 15-Cohort Fit';
+    title(strcat(title_1,' Adj. R-Sq: ',string(mdl.Rsquared.Adjusted),', R-Sq: ',string(mdl.Rsquared.Ordinary),'     BIC: ', string(mdl.ModelCriterion.BIC)));
     saveas(gcf,strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model figures\automated plots\',title_1,'.jpg'));
 
     fn = strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\models\model coefficeints\LOOCV coefficients\',title_1,'modelCoefficients.txt');

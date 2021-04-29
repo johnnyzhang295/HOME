@@ -60,6 +60,7 @@ for subj_index=1:12
     grid on;
     grid minor;
     sse = sum((predictions - subj_response').^2);
+    r_sq = corrcoef(subj_response, 
     title(strcat("Subject: ",string(subj_index)," SSE: ",string(sse)));
     % hold on;
     % subj_predictors = subj_data{:, 1:end - 1};
@@ -75,7 +76,7 @@ for subj_index=1:12
         
     
 end
-suptitle("Constant Coeff Individual Fit");
+suptitle("Workload Constant Coeff, Individualized Intercepts");
 function [subj_data,mdl] = MakeModel(subj_index)
         workload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\Workload.csv');
         taskload = load('C:\Users\BIOPACMan\Documents\Zhang\HOME\support\taskload settings\taskload settings.csv');

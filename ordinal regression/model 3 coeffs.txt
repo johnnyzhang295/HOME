@@ -1,4 +1,3 @@
-formula: 
 resp ~ HR + RMSSD + MeanNN + SDNN + CVNN + CVSD + MedianNN + MadNN + MCVNN + pNN50 + pNN20 + TINN + RSP_Amplitude + RSP_Rate + MeanPupilDiameter + BlinkCount + Age + Taskload + TrialOrder + MeanNN:MadNN + RSP_Amplitude:Taskload + MCVNN:TINN + MeanPupilDiameter:TrialOrder + BlinkCount:Age + pNN50:RSP_Amplitude + RSP_Amplitude:RSP_Rate + Age:TrialOrder + pNN20:MeanPupilDiameter + MedianNN:Age + HR:Age + Age:Taskload + CVNN:pNN20 + MeanNN:MeanPupilDiameter + MedianNN:MeanPupilDiameter
 data:    predictors
 
@@ -55,6 +54,7 @@ Threshold coefficients:
 7|8     639.7      223.0   2.869
 8|9     640.3      223.0   2.872
 9|10    642.0      223.0   2.879
+
 
 $Pseudo.R.squared.for.model.vs.null
                              Pseudo.R.squared

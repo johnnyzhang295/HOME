@@ -12,34 +12,55 @@ load('baseline data.mat');
 % raw_data(raw_data.ID == '210',:) = [];
 % raw_data(raw_data.ID == '214',:) = [];
 
-baseline_HR = baseline_data.ECG_Rate_Mean;
-HR = raw_data.ECG_Rate_Mean;
-
-baseline_pNN50 = baseline_data.HRV_pNN50;
-pNN50 = raw_data.HRV_pNN50;
-
-baseline_MCVNN = baseline_data.HRV_MCVNN;
-MCVNN = raw_data.HRV_MCVNN;
-
-xprmnt_data = [HR pNN50 MCVNN];
-bsln_data = [baseline_HR baseline_pNN50 baseline_MCVNN];
-bsln_data = repelem(bsln_data, 12, 1);
-
-labels = {'HR', 'pNN50', 'MCVNN'};
-
-std_data = [];
-means_std_data = [];
-j = 1;
-for (i=1:12:height(raw_data))
-    std_data(i:i+11,:) = normalize(xprmnt_data(i:i+11,:));
-    means_std_data(j,:) = mean(xprmnt_data(i:i+11,:));
-    
-    j = j + 1;
-end
-
-
-exp_means = repelem(means_std_data, 12, 1);
-
+% baseline_HR = baseline_data.ECG_Rate_Mean;
+% HR = raw_data.ECG_Rate_Mean;
+% 
+% baseline_pNN50 = baseline_data.HRV_pNN50;
+% pNN50 = raw_data.HRV_pNN50;
+% 
+% baseline_MCVNN = baseline_data.HRV_MCVNN;
+% MCVNN = raw_data.HRV_MCVNN;
+% 
+% xprmnt_data = [HR pNN50 MCVNN];
+% bsln_data = [baseline_HR baseline_pNN50 baseline_MCVNN];
+% bsln_data = repelem(bsln_data, 12, 1);
+% 
+% labels = {'HR', 'pNN50', 'MCVNN'};
+% 
+% std_data = [];
+% means_std_data = [];
+% j = 1;
+% for (i=1:12:height(raw_data))
+%     std_data(i:i+11,:) = normalize(xprmnt_data(i:i+11,:));
+%     means_std_data(j,:) = mean(xprmnt_data(i:i+11,:));
+%     
+%     j = j + 1;
+% end
+% 
+% 
+% exp_means = repelem(means_std_data, 12, 1);
+% 
+% 
+% figure;
+% 
+% m = fitlm(raw_data.Workload,raw_data.ECG_Rate_Mean);
+% subplot(1,3,1);
+% plot(m);
+% xlabel('Raw HR');
+% ylabel('Workload');
+% title('HR vs Workload');
+% m2 = fitlm(raw_data.Workload, log(raw_data.ECG_Rate_Mean));
+% subplot(1,3,2);
+% plot(m2);
+% xlabel('Log HR');
+% ylabel('Workload');
+% title('Log HR vs Workload');
+% m3 = fitlm(raw_data.Workload, sqrt(raw_data.ECG_Rate_Mean) );
+% subplot(1,3,3);
+% plot(m3);
+% xlabel('Sqrt HR');
+% ylabel('Workload');
+% title('Sqrt HR vs Workload');
 %%
 % % for loop
 % for (i = 1:3)
@@ -77,39 +98,47 @@ exp_means = repelem(means_std_data, 12, 1);
 %     title('Standardized Within Exp ((Y - Mu)/Std) vs Experiment Mean');
 % 
 % end
-
-%%
-
-% for (i = 2:3)
-%     y =  xprmnt_data(:,i);
+% 
+% %%
+% labels = raw_data.Properties.VariableNames(1:19);
+% for (i = [1 12 16 17 19])
+%     y =  raw_data{:,i};
 % 
 %     z = reshape(y, 12, 15);
 %     
-%     figure('units','normalized','outerposition',[0 0 1 1]);
-%     for (j=1:15)
-%         subplot(3, 5, j);
-%         normed_z = (z(:,j) - mean(z(:,j)))/std(z(:,j));
-%         [h,p] = kstest(normed_z)
-%         hold on;
-%         cdfplot(normed_z);
-%         title(strcat('Subject ',{' '}, string(j), {' '}, labels(i), ' Empirical CDF'));
-%         text(-1,.85,strcat('P-Value = ',string(p)));
-%         x_values = linspace(min(normed_z),max(normed_z));
-%         plot(x_values,normcdf(x_values,0,1),'r-')
-%         legend('Empirical CDF','Standard Normal CDF','Location','southeast')
-%     end
-% 
+% %     figure('units','normalized','outerposition',[0 0 1 1]);
+% %     for (j=1:15)
+% %         subplot(3, 5, j);
+% %         
+% %         normed_z = (z(:,j) - mean(z(:,j)))/std(z(:,j));
+% %         [h,p] = kstest(normed_z)
+% %         hold on;
+% %         cdfplot(z(:,j));
+% %         title(strcat('Subject ',{' '}, string(j), {' '}, labels(i), ' Empirical CDF'), 'Interpreter', 'none');
+% %         text(-1,.85,strcat('P-Value = ',string(p)));
+% %         x_values = linspace(min(z(:,j)),max(z(:,j)));
+% %         plot(x_values,normcdf(x_values,mean(z(:,j)), std(z(:,j))),'r-');
+% %         legend('Empirical CDF','Standard Normal CDF','Location','southeast')
+% %         
+% %     end
+% % 
+% %     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\qqplots\qqplot_individual_',sprintf(labels{i}),'.jpg'));
+% %         
+%     y = sqrt(y);
+%     y(isnan(y)) = 0;
+%     y(isinf(y)) = 0;
 %     normed_y = (y - mean(y))/std(y);
 %     [h,p] = kstest(normed_y)
 % 
 %     figure('units','normalized','outerposition',[0 0 1 1]);
 %     hold on;
-%     cdfplot(normed_y);
-%     title(strcat(labels(i), ' Empirical CDF'));
-%     text(-1,.85,strcat('P-Value = ',string(p)));
-%     x_values = linspace(min(normed_y),max(normed_y));
-%     plot(x_values,normcdf(x_values,0,1),'r-')
+%     cdfplot(y);
+%     title(strcat(labels(i), ' Empirical CDF'), 'Interpreter', 'none');
+%     text(min(y)+.1,.85,strcat('P-Value = ',string(p)));
+%     x_values = linspace(min(y),max(y));
+%     plot(x_values,normcdf(x_values,mean(y), std(y)),'r-')
 %     legend('Empirical CDF','Standard Normal CDF','Location','best')
+%     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\qqplots\qqplot_cohort_arcsine_',sprintf(labels{i}),'.jpg'));
 % 
 % end
 %% tests for normality
@@ -161,11 +190,11 @@ exp_means = repelem(means_std_data, 12, 1);
 % 
 % vartestn(reshape(raw_data{:,12}, 12, 15),'TestType','BrownForsythe');
 
-%%
+%% plot rescaled
 % 
 % rescaled = [];
 % for (i = 1:12:180)
-%     y = raw_data{i:i+11,[1:19 25 26]};
+%     y(i:i+11) = raw_data{i:i+11,[1:19 25 26]};
 %     colmin = min(y);
 %     colmax  = max(y);
 %     Bcol = rescale(y,'InputMin',colmin,'InputMax',colmax)
@@ -174,57 +203,57 @@ exp_means = repelem(means_std_data, 12, 1);
 %     rescaled(i:i+11,:) = Bcol;
 %     
 % end
-% % 
-% % labels = raw_data.Properties.VariableNames(1:19);
-% % 
-% % for (i = 1:19)
-% %     figure('units','normalized','outerposition',[0 0 1 1]);
-% % 
-% %     ids = raw_data.ID;
-% %     y =  rescaled(:,i);
-% %     wl = rescaled(:,end);
-% %     sart = rescaled(:,end-1);
-% % 
-% %     xlabel('ID');
-% %     ylabel(labels(i));
-% %     title('DV Distribution');
-% %     
-% %     plot(ids,y, 'o', 'Color','b');
-% %     hold on;
-% %     ylabel('Scaled Axis');
-% %     plot(ids, wl ,'o','Color','r');
-% %     legend({labels{i}, 'Workload'},'Interpreter','none');
-% %     title('Scaled DV vs Workload');
-% %     [h, p] = vartest2(y, wl);
-% %     text(1,.9,strcat('P-Value for F-Test: ',string(p)));
-% %     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\workload_',sprintf(labels{i}),'.jpg'));
-% %     
-% %    
-% % end
-% % 
-% % for (i = 1:19)
-% %     figure('units','normalized','outerposition',[0 0 1 1]);
-% % 
-% %     ids = raw_data.ID;
-% %     y =  rescaled(:,i);
-% %     wl = rescaled(:,end);
-% %     sart = rescaled(:,end-1);
-% % 
-% %     xlabel('ID');
-% %     ylabel(labels(i));
-% %     title('DV Distribution');
-% %     
-% %     plot(ids,y, 'o', 'Color','b');
-% %     hold on;
-% %     ylabel('Scaled Axis');
-% %     plot(ids, sart, 'o','Color','g');
-% %     legend({labels{i}, 'SART'},'Interpreter','none');
-% %     title('Scaled DV vs SART');
-% %     [h, p] = vartest2(y, sart);
-% %     text(1,.9,strcat('P-Value for F-Test: ',string(p)));
-% %     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\sart_',labels{i},'.jpg'));
-% %     
-% % end
+% 
+% labels = raw_data.Properties.VariableNames(1:19);
+% 
+% for (i = 1:19)
+%     figure('units','normalized','outerposition',[0 0 1 1]);
+% 
+%     ids = raw_data.ID;
+%     y =  rescaled(:,i);
+%     wl = rescaled(:,end);
+%     sart = rescaled(:,end-1);
+% 
+%     xlabel('ID');
+%     ylabel(labels(i));
+%     title('DV Distribution');
+%     
+%     plot(ids,y, 'o', 'Color','b');
+%     hold on;
+%     ylabel('Scaled Axis');
+%     plot(ids, wl ,'o','Color','r');
+%     legend({labels{i}, 'Workload'},'Interpreter','none');
+%     title('Scaled DV vs Workload');
+%     [h, p] = vartest2(y, wl);
+%     text(1,.9,strcat('P-Value for F-Test: ',string(p)));
+%     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\workload_',sprintf(labels{i}),'.jpg'));
+%     
+%    
+% end
+% 
+% for (i = 1:19)
+%     figure('units','normalized','outerposition',[0 0 1 1]);
+% 
+%     ids = raw_data.ID;
+%     y =  rescaled(:,i);
+%     wl = rescaled(:,end);
+%     sart = rescaled(:,end-1);
+% 
+%     xlabel('ID');
+%     ylabel(labels(i));
+%     title('DV Distribution');
+%     
+%     plot(ids,y, 'o', 'Color','b');
+%     hold on;
+%     ylabel('Scaled Axis');
+%     plot(ids, sart, 'o','Color','g');
+%     legend({labels{i}, 'SART'},'Interpreter','none');
+%     title('Scaled DV vs SART');
+%     [h, p] = vartest2(y, sart);
+%     text(1,.9,strcat('P-Value for F-Test: ',string(p)));
+%     saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\sart_',labels{i},'.jpg'));
+%     
+% end
 % 
 % p_vals_wl = [];
 % p_vals_sa = [];
@@ -257,33 +286,79 @@ exp_means = repelem(means_std_data, 12, 1);
 %     
 % end
 %%
+% 
+% p_kstests = [];
+% p_kstests_individual = [];
+% 
+% for (i = 25:26)
+%     y =  raw_data{:,i};
+% 
+%     z = reshape(y, 12, 15);
+%     
+%     for (j=1:15)
+%         normed_z = (z(:,j) - mean(z(:,j)))/std(z(:,j));
+%         [h,p] = kstest(normed_z)
+%         p_kstests_individual(j, i) = p;
+%     end
+% 
+%     normed_y = (y - mean(y))/std(y);
+%     [h,p] = kstest(normed_y)
+%     
+%     p_kstests(i) = p;
+% 
+%    
+% 
+% end
+% p_kstests(:,1:24) = [];
+% p_kstests_individual(:,1:24) = [];
+% p_kstests = array2table(p_kstests);
+% p_kstests_individual = array2table(p_kstests_individual);
+% p_kstests.Properties.VariableNames = raw_data.Properties.VariableNames(25:26);
+% 
+% p_kstests_individual.Properties.VariableNames = raw_data.Properties.VariableNames(25:26);
 
-p_kstests = [];
-p_kstests_individual = [];
 
-for (i = 25:26)
-    y =  raw_data{:,i};
+%% plot standardized vs workload sart
+%% plot rescaled
 
-    z = reshape(y, 12, 15);
+rescaled = [];
+normed_y = [];
+for (i = 1:12:180)
+    y(i:i+11,:) = raw_data{i:i+11,[1:19 25 26]};
     
-    for (j=1:15)
-        normed_z = (z(:,j) - mean(z(:,j)))/std(z(:,j));
-        [h,p] = kstest(normed_z)
-        p_kstests_individual(j, i) = p;
-    end
-
-    normed_y = (y - mean(y))/std(y);
-    [h,p] = kstest(normed_y)
     
-    p_kstests(i) = p;
-
-   
-
+    normed_y(i:i+11,:) = normalize(raw_data{i:i+11, [1:19]});
+    
 end
-p_kstests(:,1:24) = [];
-p_kstests_individual(:,1:24) = [];
-p_kstests = array2table(p_kstests);
-p_kstests_individual = array2table(p_kstests_individual);
-p_kstests.Properties.VariableNames = raw_data.Properties.VariableNames(25:26);
 
-p_kstests_individual.Properties.VariableNames = raw_data.Properties.VariableNames(25:26);
+labels = raw_data.Properties.VariableNames(1:19);
+
+for (i = 1:19)
+    figure('units','normalized','outerposition',[0 0 1 1]);
+
+    
+    plot(raw_data.Workload,normed_y(:,i), 'o', 'Color','b');
+    hold on;
+    ylabel('Workload');
+    xlabel('STAN-Standardized Y');
+    legend({labels{i}, 'Workload'},'Interpreter','none');
+    title('Standardized Y vs Workload');
+    saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\std_workload_',sprintf(labels{i}),'.jpg'));
+    
+   
+end
+
+for (i = 1:19)
+       figure('units','normalized','outerposition',[0 0 1 1]);
+
+    
+    plot(raw_data.SART,normed_y(:,i), 'o', 'Color','b');
+    hold on;
+    ylabel('SART');
+    xlabel('STAN-Standardized Y');
+    legend({labels{i}, 'SART'},'Interpreter','none');
+    title('Standardized Y vs SART');
+   saveas(gcf, strcat('C:\Users\BIOPACMan\Documents\Zhang\HOME\data vis\dv visuals\std_sart_',sprintf(labels{i}),'.jpg'));
+    
+   
+end
